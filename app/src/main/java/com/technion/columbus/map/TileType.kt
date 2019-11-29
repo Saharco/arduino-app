@@ -1,6 +1,6 @@
 package com.technion.columbus.map
 
-enum class TileType(val id: Int, val colidable: Boolean) {
+enum class TileType(val id: Int, val collidable: Boolean) {
     PLAYER_DOWN(257, true),
 
     FLOOR(20, false),
@@ -14,5 +14,16 @@ enum class TileType(val id: Int, val colidable: Boolean) {
     WALL_LEFT_UP(3, true),
     WALL_LEFT_DOWN(35, true),
     WALL_RIGHT_DOWN(37, true),
-    WALL_RIGHT_UP(5, true),
+    WALL_RIGHT_UP(5, true);
+
+    companion object {
+
+        val TILE_SIZE = 32
+
+        private val tilesMap = values().associateBy({it.id}, {it})
+
+        operator fun get(id: Int): TileType? {
+            return tilesMap[id]
+        }
+    }
 }
