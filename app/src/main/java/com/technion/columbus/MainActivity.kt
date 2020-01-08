@@ -32,8 +32,23 @@ class MainActivity : AppCompatActivity() {
             startActivity(Intent(this, ScanListActivity::class.java))
         }
 
-        floorSlotPicker = TileSlotPicker(applicationContext, floorTileBox, floors)
-        wallSlotPicker = TileSlotPicker(applicationContext, wallTileBox, walls)
-        robotSlotPicker = TileSlotPicker(applicationContext, robotTileBox, robots)
+        floorSlotPicker = TileSlotPicker(
+            applicationContext,
+            floorTileBox,
+            getString(R.string.floor_slot_picker),
+            floors
+        )
+        wallSlotPicker = TileSlotPicker(
+            applicationContext,
+            wallTileBox,
+            getString(R.string.wall_slot_picker),
+            walls
+        )
+        robotSlotPicker = TileSlotPicker(
+            applicationContext,
+            robotTileBox,
+            getString(R.string.robot_slot_picker),
+            robots
+        )
     }
 }

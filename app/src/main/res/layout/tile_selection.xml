@@ -27,15 +27,14 @@
         app:srcCompat="@drawable/tile_box_triangle_down" />
 
     <com.technion.columbus.views.ArialTextView
-        android:layout_width="100dp"
-        android:layout_height="wrap_content"
+        android:id="@+id/slotText"
+        android:layout_width="120dp"
+        android:layout_height="30dp"
         android:layout_marginTop="6dp"
-        android:textSize="18sp"
         android:gravity="center"
         android:alpha="0.6"
-        android:text="Wall"
         android:textColor="@color/colorPrimary"
-        android:maxLines="2"
+        android:maxLines="1"
         app:autoSizeMaxTextSize="18sp"
         app:autoSizeMinTextSize="14sp"
         app:autoSizeTextType="uniform"/>

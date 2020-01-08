@@ -1,6 +1,12 @@
 <resources>
     <string name="app_name">Columbus</string>
 
+
+    <!--  Main Activity strings  -->
+    <string name="floor_slot_picker">Floor</string>
+    <string name="wall_slot_picker">Wall</string>
+    <string name="robot_slot_picker">Robot</string>
+
     <!--    Scan List strings   -->
     <string name="empty_feed_text">No scans available</string>
 </resources>
