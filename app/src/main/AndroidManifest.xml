@@ -9,17 +9,24 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".LoginActivity"></activity>
-        <activity android:name=".ScanInfoActivity" />
-        <activity android:name=".ScanListActivity">
+        <activity android:name=".LoginActivity"
+            android:launchMode = "singleTop"/>
+        <activity android:name=".ScanInfoActivity"
+            android:launchMode = "singleTop"/>
+        <activity android:name=".ScanListActivity"
+            android:launchMode = "singleTop"/>
+        <activity android:name=".MainActivity"
+            android:launchMode = "singleTop"
+            android:configChanges="orientation"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
+                <action android:name="android.intent.action.VIEW"/>
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".MainActivity" />
-        <activity android:name=".map.GdxLauncher" />
+        <activity android:name=".map.GdxLauncher"
+            android:launchMode = "singleTop"/>
     </application>
 
 </manifest>

@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical" android:layout_width="wrap_content"
+    android:gravity="center"
+    android:layout_height="wrap_content"
+    android:id="@+id/tile_selection_root">
+
+    <ImageView
+        android:id="@+id/up"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:cropToPadding="true"
+        app:srcCompat="@drawable/ic_up1" />
+
+    <ImageView
+        android:id="@+id/tileBox"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        app:srcCompat="@drawable/tile_box"/>
+
+    <ImageView
+        android:id="@+id/down"
+        android:layout_marginTop="6dp"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        app:srcCompat="@drawable/tile_box_triangle_down" />
+
+    <com.technion.columbus.views.ArialTextView
+        android:layout_width="100dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
+        android:textSize="18sp"
+        android:gravity="center"
+        android:alpha="0.6"
+        android:text="Wall"
+        android:textColor="@color/colorPrimary"
+        android:maxLines="2"
+        app:autoSizeMaxTextSize="18sp"
+        app:autoSizeMinTextSize="14sp"
+        app:autoSizeTextType="uniform"/>
+
+</LinearLayout>

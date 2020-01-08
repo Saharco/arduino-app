@@ -45,7 +45,7 @@ class ScanListActivity : AppCompatActivity() {
 
     private fun createDummyDataSet(): List<ScanCardInfo> {
         val blackFloorTile = applicationContext.resources.getIdentifier("floor_tile", "drawable", applicationContext.packageName)
-        val checkeredFloorTile = applicationContext.resources.getIdentifier("checkered_wall_tile", "drawable", applicationContext.packageName)
+        val checkeredFloorTile = applicationContext.resources.getIdentifier("checkered_floor_tile", "drawable", applicationContext.packageName)
         val wallTile = applicationContext.resources.getIdentifier("wall_tile", "drawable", applicationContext.packageName)
         val dogTile = applicationContext.resources.getIdentifier("dog_tile", "drawable", applicationContext.packageName)
         val catTile = applicationContext.resources.getIdentifier("cat_tile", "drawable", applicationContext.packageName)
