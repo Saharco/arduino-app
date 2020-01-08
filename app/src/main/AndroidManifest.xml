@@ -15,7 +15,7 @@
             android:launchMode = "singleTop"/>
         <activity android:name=".ScanListActivity"
             android:launchMode = "singleTop"/>
-        <activity android:name=".MainActivity"
+        <activity android:name=".main.MainActivity"
             android:launchMode = "singleTop"
             android:configChanges="orientation"
             android:screenOrientation="portrait">

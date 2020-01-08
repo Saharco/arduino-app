@@ -1,6 +1,7 @@
-package com.technion.columbus.utility
+package com.technion.columbus.main
 
 import android.content.Context
+import android.graphics.drawable.AnimationDrawable
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
@@ -11,22 +12,23 @@ class TileSlotPicker(
     private val context: Context,
     slotPicker: View,
     slotPickerName: String,
-    private val tilesList: List<Int>
+    private val tilesList: List<Int>,
+    private val isAnimated: Boolean = false
 ) {
 
-    private val upButton = slotPicker.findViewById(R.id.up) as ImageView
-    private val downButton = slotPicker.findViewById(R.id.down) as ImageView
     val tileBox = slotPicker.findViewById(R.id.tileBox) as ImageView
     private var slotIndex = 0
 
     init {
-        val slotPickerTextView = slotPicker.findViewById(R.id.slotText) as TextView
-        slotPickerTextView.text = slotPickerName
+        slotPicker.findViewById<TextView>(R.id.slotText).apply {
+            text = slotPickerName
+        }
         setIndexTile()
-        upButton.setOnClickListener {
+
+        slotPicker.findViewById<ImageView>(R.id.up).setOnClickListener {
             incrementSlotIndex()
         }
-        downButton.setOnClickListener {
+        slotPicker.findViewById<ImageView>(R.id.down).setOnClickListener {
             decrementSlotIndex()
         }
     }
@@ -42,6 +44,11 @@ class TileSlotPicker(
         setIndexTile()
     }
 
-    private fun setIndexTile() =
-        tileBox.setImageDrawable(ContextCompat.getDrawable(context, tilesList[slotIndex]))
+    private fun setIndexTile() {
+        tileBox.setBackgroundResource(tilesList[slotIndex])
+        if (isAnimated) {
+            val animation = tileBox.background as AnimationDrawable
+            animation.start()
+        }
+    }
 }

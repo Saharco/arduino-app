@@ -197,7 +197,7 @@
                         android:id="@+id/tile3"
                         android:layout_width="48dp"
                         android:layout_height="48dp"
-                        android:background="@drawable/dog_tile"
+                        android:background="@drawable/dog_front"
                         android:layout_marginTop="12dp"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
