@@ -16,12 +16,12 @@ class MainActivity : AppCompatActivity() {
         const val TAG = "Columbus"
     }
 
-    val floors = listOf(
+    private val floors = listOf(
         R.drawable.floor_tile,
         R.drawable.checkered_floor_tile
     )
-    val walls = listOf(R.drawable.wall_tile)
-    val robots = listOf(
+    private val walls = listOf(R.drawable.wall_tile)
+    private val robots = listOf(
         R.drawable.dog_spin_animation,
         R.drawable.cat_spin_animation,
         R.drawable.chicken_spin_animation,
@@ -29,9 +29,9 @@ class MainActivity : AppCompatActivity() {
         R.drawable.sheep_spin_animation
     )
 
-    lateinit var floorSlotPicker: TileSlotPicker
-    lateinit var wallSlotPicker: TileSlotPicker
-    lateinit var robotSlotPicker: TileSlotPicker
+    private lateinit var floorSlotPicker: TileSlotPicker
+    private lateinit var wallSlotPicker: TileSlotPicker
+    private lateinit var robotSlotPicker: TileSlotPicker
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -46,19 +46,16 @@ class MainActivity : AppCompatActivity() {
         }
 
         floorSlotPicker = TileSlotPicker(
-            applicationContext,
             floorTileBox,
             getString(R.string.floor_slot_picker),
             floors
         )
         wallSlotPicker = TileSlotPicker(
-            applicationContext,
             wallTileBox,
             getString(R.string.wall_slot_picker),
             walls
         )
         robotSlotPicker = TileSlotPicker(
-            applicationContext,
             robotTileBox,
             getString(R.string.robot_slot_picker),
             robots,
