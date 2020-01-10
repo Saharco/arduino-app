@@ -9,6 +9,19 @@
     <string name="start_scan_button">Start Scan</string>
     <string name="previous_scans_button">Previous Scans</string>
 
+    <!--  Scan Configuration strings  -->
+    <string name="scan_configuration_title">Scan Configuration</string>
+    <string name="scan_name_hint">Enter scan\'s name</string>
+    <string name="control_mode_instruction">Control Mode:</string>
+    <string name="automatic_control_option">Automatic</string>
+    <string name="manual_control_option">Manual</string>
+    <string name="map_mode_instruction">Map Style:</string>
+    <string name="pixel_map_option">Pixel Game</string>
+    <string name="blueprint_map_option">Blueprint</string>
+    <string name="scan_radius_title">Scan Radius: (in meters)</string>
+    <string name="scan_error_no_name">Please choose a name for this scan</string>
+    <string name="scan_error_no_map_scan_mode">Please specify both the control mode and map style for this scan</string>
+
     <!--    Scan List strings   -->
     <string name="empty_feed_text">No scans available</string>
 </resources>

@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:animateLayoutChanges="true">
+
+    <EditText
+        android:id="@+id/scanName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:textSize="18sp"
+        android:hint="@string/scan_name_hint"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:inputType="text" />
+
+    <TextView
+        android:id="@+id/controlModeTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="24dp"
+        android:text="@string/control_mode_instruction"
+        android:textSize="16sp"
+        app:layout_constraintBottom_toBottomOf="@id/controlModeOptions"
+        app:layout_constraintTop_toTopOf="@id/controlModeOptions"
+        app:layout_constraintEnd_toStartOf="@id/controlModeOptions"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <RadioGroup
+        android:id="@+id/controlModeOptions"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:gravity="center_horizontal"
+        android:orientation="horizontal"
+        android:paddingStart="-30dp"
+        android:paddingEnd="0dp"
+        app:layout_constraintBottom_toTopOf="@+id/controlModeDivider"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/controlModeTitle"
+        app:layout_constraintTop_toBottomOf="@id/scanName">
+
+        <RadioButton
+            android:id="@+id/controlModeAutomatic"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingStart="6dp"
+            android:paddingEnd="6dp"
+            android:textSize="13sp"
+            android:text="@string/automatic_control_option" />
+
+        <RadioButton
+            android:id="@+id/controlModeManual"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:paddingStart="6dp"
+            android:paddingEnd="6dp"
+            android:textSize="13sp"
+            android:text="@string/manual_control_option" />
+
+    </RadioGroup>
+
+    <View
+        android:id="@+id/controlModeDivider"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="6dp"
+        android:layout_marginEnd="16dp"
+        android:background="@color/contour"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/controlModeTitle" />
+
+
+    <TextView
+        android:id="@+id/mapModeTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="24dp"
+        android:text="@string/map_mode_instruction"
+        android:textSize="16sp"
+        app:layout_constraintTop_toTopOf="@id/mapModeOptions"
+        app:layout_constraintBottom_toBottomOf="@id/mapModeOptions"
+        app:layout_constraintEnd_toStartOf="@id/mapModeOptions"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <RadioGroup
+        android:id="@+id/mapModeOptions"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:gravity="center_horizontal"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toTopOf="@+id/mapModeDivider"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/mapModeTitle"
+        app:layout_constraintTop_toTopOf="@id/controlModeDivider">
+
+        <RadioButton
+            android:id="@+id/mapModeGame"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingStart="6dp"
+            android:paddingEnd="6dp"
+            android:textSize="13sp"
+            android:text="@string/pixel_map_option" />
+
+        <RadioButton
+            android:id="@+id/mapModeBlueprint"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:paddingStart="6dp"
+            android:paddingEnd="6dp"
+            android:textSize="13sp"
+            android:text="@string/blueprint_map_option" />
+
+    </RadioGroup>
+
+    <View
+        android:id="@+id/mapModeDivider"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="6dp"
+        android:layout_marginEnd="16dp"
+        android:background="@color/contour"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/mapModeTitle" />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/automaticModeOptions"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:visibility="gone"
+        app:layout_constraintTop_toBottomOf="@+id/mapModeDivider">
+
+        <TextView
+            android:id="@+id/scanRadiusTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="24dp"
+            android:text="@string/scan_radius_title"
+            android:textSize="16sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <com.robinhood.ticker.TickerView
+            android:id="@+id/scanRadiusPicker"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/colorAccent"
+            android:textSize="20sp"
+            android:gravity="center"
+            app:ticker_animationDuration="1500"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toEndOf="@id/scanRadiusTitle"
+            app:layout_constraintEnd_toEndOf="parent"/>
+
+        <SeekBar
+            android:id="@+id/scanRadiusSeekBar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:max="900"
+            android:progress="450"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/scanRadiusTitle"/>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
