@@ -22,6 +22,9 @@
     <string name="scan_error_no_name">Please choose a name for this scan</string>
     <string name="scan_error_no_map_scan_mode">Please specify both the control mode and map style for this scan</string>
 
+    <!--  Map Activity strings  -->
+    <string name="end_scan_button">Finish Scan</string>
+
     <!--    Scan List strings   -->
     <string name="empty_feed_text">No scans available</string>
 </resources>

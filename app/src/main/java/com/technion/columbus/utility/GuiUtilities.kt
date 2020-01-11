@@ -22,7 +22,7 @@ fun changeStatusBarColor(activity: Activity, color: Int) {
 }
 
 /**
- * Shows a highlighted text (colored in yellow) in a snackbar.
+ * Shows a highlighted text in a snackbar.
  * Used mainly to notify the user about errors
  *
  * @param root: the context's root element (activity's root layout)
@@ -30,8 +30,8 @@ fun changeStatusBarColor(activity: Activity, color: Int) {
  */
 fun makeHighlightedSnackbar(root: View, msg: String) {
     val snackbar = Snackbar.make(root, msg, Snackbar.LENGTH_SHORT)
-    val textView =
-        snackbar.view.findViewById<TextView>(com.google.android.material.R.id.snackbar_text)
-    textView.setTextColor(Color.YELLOW)
+//    val textView =
+//        snackbar.view.findViewById<TextView>(com.google.android.material.R.id.snackbar_text)
+//    textView.setTextColor(Color.YELLOW)
     snackbar.show()
 }

@@ -15,6 +15,7 @@ import com.afollestad.materialdialogs.customview.customView
 import com.afollestad.materialdialogs.customview.getCustomView
 import com.robinhood.ticker.TickerUtils
 import com.robinhood.ticker.TickerView
+import com.technion.columbus.GameMapActivity
 import com.technion.columbus.R
 import com.technion.columbus.ScanListActivity
 import com.technion.columbus.map.GdxLauncher
@@ -131,7 +132,7 @@ class MainActivity : AppCompatActivity() {
 
             val scanRadius = seekBarProgressToScanRadius(scanRadiusSeekBar.progress)
 
-            val startGameIntent = Intent(this@MainActivity, GdxLauncher::class.java)
+            val startGameIntent = Intent(this@MainActivity, GameMapActivity::class.java)
             startGameIntent.putExtra(SCAN_NAME, name)
             startGameIntent.putExtra(MAP_SCAN_MODE, mapScanMode)
             startGameIntent.putExtra(SCAN_RADIUS, scanRadius)
