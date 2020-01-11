@@ -4,7 +4,9 @@ import android.graphics.drawable.AnimationDrawable
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
 import com.technion.columbus.R
+import com.technion.columbus.utility.makeHighlightedSnackbar
 import kotlin.properties.Delegates
 
 /**
@@ -33,11 +35,20 @@ class TileSlotPicker(
         }
         setIndexTile()
 
-        slotPicker.findViewById<ImageView>(R.id.up).setOnClickListener {
-            incrementSlotIndex()
-        }
-        slotPicker.findViewById<ImageView>(R.id.down).setOnClickListener {
-            decrementSlotIndex()
+        if (tilesList.size == 1) {
+            slotPicker.findViewById<ImageView>(R.id.up).setOnClickListener {
+                makeHighlightedSnackbar(slotPicker, "More tiles will be added in the future!")
+            }
+            slotPicker.findViewById<ImageView>(R.id.down).setOnClickListener {
+                makeHighlightedSnackbar(slotPicker, "More tiles will be added in the future!")
+            }
+        } else {
+            slotPicker.findViewById<ImageView>(R.id.up).setOnClickListener {
+                incrementSlotIndex()
+            }
+            slotPicker.findViewById<ImageView>(R.id.down).setOnClickListener {
+                decrementSlotIndex()
+            }
         }
     }
 

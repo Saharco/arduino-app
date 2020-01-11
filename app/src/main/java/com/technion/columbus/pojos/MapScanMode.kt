@@ -1,6 +1,8 @@
 package com.technion.columbus.pojos
 
-enum class MapScanMode {
+import java.io.Serializable
+
+enum class MapScanMode : Serializable {
     MODE_ILLEGAL,
     MODE_AUTOMATIC_GAME,
     MODE_MANUAL_GAME,

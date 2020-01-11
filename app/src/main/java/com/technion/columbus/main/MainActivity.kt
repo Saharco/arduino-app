@@ -19,7 +19,7 @@ import com.technion.columbus.R
 import com.technion.columbus.ScanListActivity
 import com.technion.columbus.map.GdxLauncher
 import com.technion.columbus.pojos.MapScanMode
-import com.technion.columbus.utility.changeStatusBarColor
+import com.technion.columbus.utility.*
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
@@ -51,7 +51,6 @@ class MainActivity : AppCompatActivity() {
         changeStatusBarColor(this, ContextCompat.getColor(this, R.color.colorPrimary))
 
         scanButton.setOnClickListener {
-            //            startActivity(Intent(this, GdxLauncher::class.java))
             displayConfigurationDialog()
         }
         previousScansButton.setOnClickListener {
@@ -130,8 +129,16 @@ class MainActivity : AppCompatActivity() {
                 return@positiveButton
             }
 
-            val scanRadius = scanRadiusSeekBar.progress.toFloat() / 100 + 1
-            //TODO: dispatch to different maps based on mapScanMode
+            val scanRadius = seekBarProgressToScanRadius(scanRadiusSeekBar.progress)
+
+            val startGameIntent = Intent(this@MainActivity, GdxLauncher::class.java)
+            startGameIntent.putExtra(SCAN_NAME, name)
+            startGameIntent.putExtra(MAP_SCAN_MODE, mapScanMode)
+            startGameIntent.putExtra(SCAN_RADIUS, scanRadius)
+            startGameIntent.putExtra(CHOSEN_FLOOR_TILE, floorSlotPicker.tileId)
+            startGameIntent.putExtra(CHOSEN_WALL_TILE, wallSlotPicker.tileId)
+            startGameIntent.putExtra(CHOSEN_PROBOT_TILE, robotSlotPicker.tileId)
+            startActivity(startGameIntent)
             dialog.dismiss()
         }
 
@@ -148,7 +155,7 @@ class MainActivity : AppCompatActivity() {
                     progress: Int,
                     fromUser: Boolean
                 ) {
-                    val distance = progress.toFloat() / 100 + 1
+                    val distance = seekBarProgressToScanRadius(progress)
                     scanRadiusPicker.text = String.format("%.2f", distance)
                 }
 
@@ -160,7 +167,7 @@ class MainActivity : AppCompatActivity() {
 
             })
 
-            val distance = scanRadiusSeekBar.progress.toFloat() / 100 + 1
+            val distance = seekBarProgressToScanRadius(scanRadiusSeekBar.progress)
             scanRadiusPicker.text = String.format("%.2f", distance)
 
             controlModeAutomatic.setOnClickListener {
@@ -172,4 +179,6 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
+
+    private fun seekBarProgressToScanRadius(progress: Int) = progress.toFloat() / 100 + 1
 }
