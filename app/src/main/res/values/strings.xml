@@ -24,6 +24,10 @@
 
     <!--  Map Activity strings  -->
     <string name="end_scan_button">Finish Scan</string>
+    <string name="dismiss_map_title">Cancel Scan</string>
+    <string name="dismiss_map_message">Your map will not be saved.\nAre you sure you want to dismiss this scan?</string>
+    <string name="loading_scan_upload_title">Uploading your scan…</string>
+    <string name="loading_scan_upload_message">This process might take a while</string>
 
     <!--    Scan List strings   -->
     <string name="empty_feed_text">No scans available</string>

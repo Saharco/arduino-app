@@ -15,18 +15,20 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
 
-    <ImageView
+    <Button
         android:id="@+id/disposeScanButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="4dp"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_marginTop="8dp"
         android:layout_marginStart="4dp"
+        android:tint="@color/colorPrimary"
+        android:background="@android:color/transparent"
+        android:drawableTop="@drawable/ic_close_white_40dp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/ic_close_white" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <android.widget.Button
-        android:id="@+id/previousScansButton"
+        android:id="@+id/finishScanButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:background="@drawable/main_screen_button_shape"

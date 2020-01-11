@@ -1,7 +1,16 @@
 package com.technion.columbus
 
+import android.app.ProgressDialog
+import android.content.Intent
+import android.graphics.Typeface
 import android.os.Bundle
+import android.os.Handler
+import android.view.Gravity
+import android.widget.TextView
+import androidx.appcompat.app.AlertDialog
+import androidx.core.content.ContextCompat
 import com.badlogic.gdx.backends.android.AndroidApplication
+import com.technion.columbus.main.MainActivity
 import com.technion.columbus.map.MapScreen
 import kotlinx.android.synthetic.main.activity_game_map.*
 
@@ -12,9 +21,28 @@ class GameMapActivity : AndroidApplication() {
         setContentView(R.layout.activity_game_map)
 
         val gameFrame = gameMapView
-        val game = initializeForView(MapScreen())
+        val game = MapScreen()
+        val gameView = initializeForView(game)
 
-        gameFrame.addView(game)
+        gameFrame.addView(gameView)
+
+        disposeScanButton.setOnClickListener {
+            onBackPressed()
+        }
+
+        finishScanButton.setOnClickListener {
+            ProgressDialog.show(
+                this@GameMapActivity,
+                getString(R.string.loading_scan_upload_title),
+                getString(R.string.loading_scan_upload_message)
+            )
+                .isIndeterminate = true
+
+            //FIXME: need to create an AsyncTask that will: 1. stop listening for changes via network in the game. 2. get the tilemap from the game. 3. upload the tilemap to firebase. 4. start the next activity
+            Handler().postDelayed({
+                startActivity(Intent(this@GameMapActivity, MainActivity::class.java))
+            }, 1250L) // this artificial loading is just a placeholder
+        }
 
 //
 //        val listener = object : ApplicationListener {
@@ -68,5 +96,23 @@ class GameMapActivity : AndroidApplication() {
 //            }
 //
 //        }
+    }
+
+    override fun onBackPressed() {
+        val title = TextView(this)
+        title.setText(R.string.dismiss_map_title)
+        title.textSize = 20f
+        title.setTypeface(null, Typeface.BOLD)
+        title.setTextColor(ContextCompat.getColor(this, R.color.colorText))
+        title.gravity = Gravity.CENTER
+        title.setPadding(10, 40, 10, 24)
+        val builder = AlertDialog.Builder(this)
+        builder.setCustomTitle(title)
+            .setMessage(R.string.dismiss_map_message)
+            .setPositiveButton(android.R.string.yes) { _, _ -> super.onBackPressed() }
+            .setNegativeButton(android.R.string.no) { _, _ -> }
+            .show()
+        builder.create()
+        return
     }
 }
