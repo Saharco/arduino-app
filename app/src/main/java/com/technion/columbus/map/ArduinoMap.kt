@@ -32,4 +32,8 @@ class ArduinoMap : GameMap {
 
         return TileType[id]
     }
+
+    fun asMatrix(): ArrayList<Int> {
+        return ArrayList()
+    }
 }

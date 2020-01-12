@@ -19,7 +19,7 @@ import com.technion.columbus.main.MainActivity.Companion.TAG
 class MapScreen : ApplicationAdapter(), InputProcessor {
 
     private lateinit var batch: SpriteBatch
-    private lateinit var map: ArduinoMap
+    lateinit var map: ArduinoMap
     private lateinit var camera: OrthographicCamera
 
     override fun create() {

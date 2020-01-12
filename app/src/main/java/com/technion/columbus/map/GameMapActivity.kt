@@ -1,10 +1,9 @@
-package com.technion.columbus
+package com.technion.columbus.map
 
 import android.app.ProgressDialog
 import android.content.Intent
 import android.graphics.Typeface
 import android.os.Bundle
-import android.os.Handler
 import android.view.Gravity
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
@@ -14,22 +13,49 @@ import com.afollestad.materialdialogs.callbacks.onDismiss
 import com.afollestad.materialdialogs.customview.customView
 import com.afollestad.materialdialogs.customview.getCustomView
 import com.badlogic.gdx.backends.android.AndroidApplication
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.model.value.ServerTimestampValue
+import com.google.firestore.v1.DocumentTransform
+import com.technion.columbus.R
 import com.technion.columbus.main.MainActivity
-import com.technion.columbus.map.MapScreen
+import com.technion.columbus.pojos.MapMatrix
+import com.technion.columbus.pojos.MapScanMode
+import com.technion.columbus.pojos.Scan
+import com.technion.columbus.utility.*
 import it.emperor.animatedcheckbox.AnimatedCheckBox
 import kotlinx.android.synthetic.main.activity_game_map.*
-import net.igenius.customcheckbox.CustomCheckBox
+import java.util.*
 
 class GameMapActivity : AndroidApplication() {
+
+    private val db = FirebaseFirestore.getInstance()
+
+    private var scanName: String? = null
+    private var mapScanMode :MapScanMode? = null
+    private var scanRadius: Float? = null
+    private var chosenFloorTile: Int? = null
+    private var chosenWallTile: Int? = null
+    private var chosenRobotTile: Int? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_game_map)
 
+        // fetch all the scan parameters
+        scanName = intent.getStringExtra(SCAN_NAME)
+        mapScanMode = intent.getSerializableExtra(MAP_SCAN_MODE) as MapScanMode
+        scanRadius = intent.getFloatExtra(SCAN_RADIUS, 1f)
+        chosenFloorTile = intent.getIntExtra(CHOSEN_FLOOR_TILE, R.drawable.floor_tile)
+        chosenWallTile = intent.getIntExtra(CHOSEN_WALL_TILE, R.drawable.wall_tile)
+        chosenRobotTile = intent.getIntExtra(CHOSEN_ROBOT_TILE, R.drawable.dog_front_idle)
+
+        // start the game window
         val gameFrame = gameMapView
         val game = MapScreen()
         val gameView = initializeForView(game)
 
+
+        // add game window to GUI
         gameFrame.addView(gameView)
 
         disposeScanButton.setOnClickListener {
@@ -46,10 +72,26 @@ class GameMapActivity : AndroidApplication() {
             progressDialog.isIndeterminate = true
 
             //FIXME: need to create an AsyncTask that will: 1. stop listening for changes via network in the game. 2. get the tilemap from the game. 3. upload the tilemap to firebase. 4. start the next activity
-            Handler().postDelayed({
-                progressDialog.dismiss()
-                displayFinishedScanDialog()
-            }, 1250L) // this artificial loading is just a placeholder
+            val map = MapMatrix(game.map.height, game.map.width, game.map.asMatrix())
+            db.collection("mapGrids")
+                .add(map) // check if this is fine
+                .addOnSuccessListener {
+                    val scan = Scan(
+                        scanName!!,
+                        it.id,
+                        Date(System.currentTimeMillis()),
+                        scanRadius!!,
+                        chosenFloorTile!!,
+                        chosenWallTile!!,
+                        chosenRobotTile!!
+                    )
+                    db.collection("scans")
+                        .add(scan) // check if this is fine
+                        .addOnSuccessListener {
+                            progressDialog.dismiss()
+                            displayFinishedScanDialog()
+                        }
+                }
         }
 
 //
@@ -136,7 +178,9 @@ class GameMapActivity : AndroidApplication() {
         title.setText(R.string.dismiss_map_title)
         title.textSize = 20f
         title.setTypeface(null, Typeface.BOLD)
-        title.setTextColor(ContextCompat.getColor(this, R.color.colorText))
+        title.setTextColor(ContextCompat.getColor(this,
+            R.color.colorText
+        ))
         title.gravity = Gravity.CENTER
         title.setPadding(10, 40, 10, 24)
         val builder = AlertDialog.Builder(this)
