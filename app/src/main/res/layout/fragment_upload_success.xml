@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <it.emperor.animatedcheckbox.AnimatedCheckBox
+        android:id="@+id/uploadSuccessCheckBox"
+        android:layout_width="72dp"
+        android:layout_height="72dp"
+        android:layout_marginTop="16dp"
+        android:layout_gravity="center"
+        app:acb_animation_duration="900"
+        app:acb_border_checked_color="@android:color/white"
+        app:acb_border_checked_stroke_width="0dp"
+        app:acb_border_not_checked_color="@android:color/white"
+        app:acb_checked="false"
+        app:acb_circle_color="@color/colorAccent"
+        app:acb_hook_color="@android:color/white"
+        app:acb_hook_stroke_width="2dp"
+        app:acb_padding="4dp"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:gravity="center"
+        android:layout_gravity="center"
+        android:textColor="@android:color/white"
+        android:textStyle="bold"
+        android:textSize="18sp"
+        android:text="@string/upload_success_dialog_title"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:layout_gravity="center"
+        android:layout_marginTop="4dp"
+        android:layout_marginBottom="12dp"
+        android:text="@string/upload_success_dialog_message"/>
+</LinearLayout>

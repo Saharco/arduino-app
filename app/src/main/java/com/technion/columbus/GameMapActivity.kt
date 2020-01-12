@@ -9,10 +9,16 @@ import android.view.Gravity
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
+import com.afollestad.materialdialogs.MaterialDialog
+import com.afollestad.materialdialogs.callbacks.onDismiss
+import com.afollestad.materialdialogs.customview.customView
+import com.afollestad.materialdialogs.customview.getCustomView
 import com.badlogic.gdx.backends.android.AndroidApplication
 import com.technion.columbus.main.MainActivity
 import com.technion.columbus.map.MapScreen
+import it.emperor.animatedcheckbox.AnimatedCheckBox
 import kotlinx.android.synthetic.main.activity_game_map.*
+import net.igenius.customcheckbox.CustomCheckBox
 
 class GameMapActivity : AndroidApplication() {
 
@@ -31,16 +37,18 @@ class GameMapActivity : AndroidApplication() {
         }
 
         finishScanButton.setOnClickListener {
-            ProgressDialog.show(
+            val progressDialog = ProgressDialog.show(
                 this@GameMapActivity,
-                getString(R.string.loading_scan_upload_title),
+                getString(R.string.scan_upload_title),
                 getString(R.string.loading_scan_upload_message)
             )
-                .isIndeterminate = true
+
+            progressDialog.isIndeterminate = true
 
             //FIXME: need to create an AsyncTask that will: 1. stop listening for changes via network in the game. 2. get the tilemap from the game. 3. upload the tilemap to firebase. 4. start the next activity
             Handler().postDelayed({
-                startActivity(Intent(this@GameMapActivity, MainActivity::class.java))
+                progressDialog.dismiss()
+                displayFinishedScanDialog()
             }, 1250L) // this artificial loading is just a placeholder
         }
 
@@ -96,6 +104,31 @@ class GameMapActivity : AndroidApplication() {
 //            }
 //
 //        }
+    }
+
+    private fun displayFinishedScanDialog() {
+        val dialog = MaterialDialog(this@GameMapActivity)
+        dialog.cornerRadius(20f)
+            .noAutoDismiss()
+            .customView(R.layout.fragment_upload_success)
+
+        dialog.cancelOnTouchOutside(false)
+
+        val dialogView = dialog.getCustomView()
+        val uploadSuccessCheckBox =
+            dialogView.findViewById<AnimatedCheckBox>(R.id.uploadSuccessCheckBox)
+        uploadSuccessCheckBox.setChecked(checked = true, animate = true)
+
+        dialog.positiveButton(R.string.upload_success_ok) {
+            startActivity(Intent(this@GameMapActivity, MainActivity::class.java))
+            dialog.dismiss()
+        }
+
+        dialog.onDismiss {
+            startActivity(Intent(this@GameMapActivity, MainActivity::class.java))
+        }
+
+        dialog.show()
     }
 
     override fun onBackPressed() {

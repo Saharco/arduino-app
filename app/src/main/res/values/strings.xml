@@ -26,8 +26,11 @@
     <string name="end_scan_button">Finish Scan</string>
     <string name="dismiss_map_title">Cancel Scan</string>
     <string name="dismiss_map_message">Your map will not be saved.\nAre you sure you want to dismiss this scan?</string>
-    <string name="loading_scan_upload_title">Uploading your scan…</string>
-    <string name="loading_scan_upload_message">This process might take a while</string>
+    <string name="scan_upload_title">Upload</string>
+    <string name="loading_scan_upload_message">Your scan is being uploaded.\nThis process might take a while</string>
+    <string name="upload_success_dialog_title">Scan uploaded successfully!</string>
+    <string name="upload_success_dialog_message">You can view this scan in "Previous Scans"</string>
+    <string name="upload_success_ok">Awesome!</string>
 
     <!--    Scan List strings   -->
     <string name="empty_feed_text">No scans available</string>
