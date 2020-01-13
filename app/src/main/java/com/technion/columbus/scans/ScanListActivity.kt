@@ -1,25 +1,38 @@
 package com.technion.columbus.scans
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.TextView
-import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.firebase.ui.firestore.FirestoreRecyclerAdapter
+import com.firebase.ui.firestore.FirestoreRecyclerOptions
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.Query
 import com.technion.columbus.R
+import com.technion.columbus.pojos.Scan
 import kotlinx.android.synthetic.main.activity_scan_list.*
+import java.text.SimpleDateFormat
+import java.util.*
 
 class ScanListActivity : AppCompatActivity() {
 
+    companion object {
+        const val TAG = "Columbus/ScanList"
+    }
+
     private lateinit var recyclerView: RecyclerView
     private lateinit var emptyListView: View
-    private lateinit var viewAdapter: ScanCardAdapter
+
+    private val db = FirebaseFirestore.getInstance()
+    private lateinit var allScansAdapter: FirestoreRecyclerAdapter<Scan, ScanCardViewHolder>
+    private lateinit var searchAdapter: RecyclerView.Adapter<ScanCardViewHolder>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -29,13 +42,8 @@ class ScanListActivity : AppCompatActivity() {
         val viewManager = LinearLayoutManager(this)
         viewManager.orientation = LinearLayoutManager.VERTICAL
 
-        val dummyDataSet = createDummyDataSet()
-        viewAdapter = ScanCardAdapter(dummyDataSet)
-
         recyclerView = findViewById<RecyclerView>(R.id.scan_list).apply {
             setHasFixedSize(true)
-            layoutManager = viewManager
-            adapter = viewAdapter
         }
 
         setSupportActionBar(previousScansToolbar)
@@ -43,51 +51,65 @@ class ScanListActivity : AppCompatActivity() {
         supportActionBar?.setDisplayShowHomeEnabled(true)
     }
 
-    private fun createDummyDataSet(): List<ScanCardInfo> {
-        val blackFloorTile = applicationContext.resources.getIdentifier("floor_tile", "drawable", applicationContext.packageName)
-        val checkeredFloorTile = applicationContext.resources.getIdentifier("checkered_floor_tile", "drawable", applicationContext.packageName)
-        val wallTile = applicationContext.resources.getIdentifier("wall_tile", "drawable", applicationContext.packageName)
-        val dogTile = applicationContext.resources.getIdentifier("dog_front", "drawable", applicationContext.packageName)
-        val catTile = applicationContext.resources.getIdentifier("cat_front", "drawable", applicationContext.packageName)
-        val chickenTile = applicationContext.resources.getIdentifier("chicken_front", "drawable", applicationContext.packageName)
-        val list = mutableListOf<ScanCardInfo>()
-        list.add(
-            ScanCardInfo(
-                "Taub 9",
-                "01/12/2019",
-                "15:00",
-                blackFloorTile,
-                wallTile,
-                dogTile
-            )
-        )
-        list.add(
-            ScanCardInfo(
-                "Ullman 614",
-                "31/11/2019",
-                "16:30",
-                checkeredFloorTile,
-                wallTile,
-                catTile
-            )
-        )
-        list.add(
-            ScanCardInfo(
-                "Taub 313",
-                "31/11/2019",
-                "12:30",
-                checkeredFloorTile,
-                wallTile,
-                chickenTile
-            )
-        )
-        list.add(
-            ScanCardInfo(
-                "My big and magnificent dormitory room with astonishing view to the Haifa bay",
-                "30/11/2019", "21:00", blackFloorTile, wallTile, catTile
-            )
-        )
-        return list
+    override fun onStart() {
+        super.onStart()
+        showAllScans()
+    }
+
+    override fun onStop() {
+        super.onStop()
+        //searchView.closeSearch()
+        allScansAdapter.stopListening()
+    }
+
+    private fun showAllScans() {
+        Log.d(TAG, "Showing all previous scans")
+
+        val adapterQuery = db.collection("scans")
+            .orderBy("timestamp", Query.Direction.DESCENDING)
+        val options = FirestoreRecyclerOptions.Builder<Scan>()
+            .setQuery(adapterQuery, Scan::class.java)
+            .build()
+        allScansAdapter = createFirebaseAdapter(options)
+        recyclerView.layoutManager = LinearLayoutManager(this)
+        recyclerView.adapter = allScansAdapter
+        allScansAdapter.startListening()
+    }
+
+    private fun createFirebaseAdapter(options: FirestoreRecyclerOptions<Scan>): FirestoreRecyclerAdapter<Scan, ScanCardViewHolder> {
+        return object : FirestoreRecyclerAdapter<Scan, ScanCardViewHolder>(options) {
+            override fun onCreateViewHolder(
+                parent: ViewGroup,
+                viewType: Int
+            ): ScanCardViewHolder {
+                val itemView =
+                    LayoutInflater.from(parent.context).inflate(R.layout.scan_card, parent, false)
+                return ScanCardViewHolder(itemView)
+            }
+
+            @SuppressLint("SimpleDateFormat")
+            override fun onBindViewHolder(
+                holder: ScanCardViewHolder,
+                position: Int,
+                scan: Scan
+            ) {
+                val dateFormat = SimpleDateFormat("dd.MM.yyyy")
+                val hourFormat = SimpleDateFormat("HH:mm")
+                val date = Date(scan.timestamp!!.time)
+
+                holder.scanTitle.text = scan.scanName
+                holder.scanDate.text = dateFormat.format(date)
+                holder.scanTime.text = hourFormat.format(date)
+                holder.floorTile.setImageResource(scan.floorResId)
+                holder.wallTile.setImageResource(scan.wallResId)
+                holder.robotTile.setImageResource(scan.robotResId)
+                holder.card.setOnClickListener {
+                    val intent = Intent(it.context, ScanInfoActivity::class.java)
+                    it.context.startActivity(intent)
+                }
+            }
+
+        }
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -96,49 +118,5 @@ class ScanListActivity : AppCompatActivity() {
                 onBackPressed()
         }
         return super.onOptionsItemSelected(item)
-    }
-}
-
-
-// Temporary dummy classes for testing the Recycler View
-
-data class ScanCardInfo(
-    var scanTitle: String,
-    var scanDate: String,
-    var scanTime: String,
-    var floorTile: Int,
-    var wallTile: Int,
-    var robotTile: Int)
-
-class ScanCardViewHolder(v: View): RecyclerView.ViewHolder(v) {
-    var scanTitle: TextView = v.findViewById(R.id.scan_title)
-    var scanDate: TextView = v.findViewById(R.id.date_text)
-    var scanTime: TextView = v.findViewById(R.id.time_text)
-    var floorTile: ImageView = v.findViewById(R.id.floor_tile)
-    var wallTile: ImageView = v.findViewById(R.id.wall_tile)
-    var robotTile: ImageView = v.findViewById(R.id.robot_tile)
-    var card: CardView = v.findViewById(R.id.scan_card)
-}
-
-class ScanCardAdapter(private val list: List<ScanCardInfo>): RecyclerView.Adapter<ScanCardViewHolder>() {
-    override fun getItemCount(): Int  = list.size
-
-    override fun onBindViewHolder(holder: ScanCardViewHolder, position: Int) {
-        val item = list[position]
-        holder.scanTitle.text = item.scanTitle
-        holder.scanDate.text = item.scanDate
-        holder.scanTime.text = item.scanTime
-        holder.floorTile.setImageResource(item.floorTile)
-        holder.wallTile.setImageResource(item.wallTile)
-        holder.robotTile.setImageResource(item.robotTile)
-        holder.card.setOnClickListener {
-            val intent = Intent(it.context, ScanInfoActivity::class.java)
-            it.context.startActivity(intent)
-        }
-    }
-
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ScanCardViewHolder {
-        val itemView = LayoutInflater.from(parent.context).inflate(R.layout.scan_card, parent, false)
-        return ScanCardViewHolder(itemView)
     }
 }
