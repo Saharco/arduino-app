@@ -49,6 +49,7 @@ class ScanListActivity : AppCompatActivity() {
 
         searchView.background = ContextCompat.getDrawable(this, R.drawable.search_background)
         searchView.setBackIcon(getDrawable(R.drawable.ic_arrow_back_white_24dp))
+        searchView.setTextColor(ContextCompat.getColor(this, R.color.colorText))
     }
 
     override fun onStart() {

@@ -13,8 +13,9 @@ class ScanInfoActivity : AppCompatActivity() {
         setContentView(R.layout.activity_scan_info)
 
         setSupportActionBar(scanInfoToolbar)
+        supportActionBar?.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white_24dp)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        supportActionBar?.setDisplayShowHomeEnabled(true)
+        supportActionBar?.setDisplayShowTitleEnabled(false)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
