@@ -31,7 +31,7 @@ class ScanListActivity : AppCompatActivity() {
 
     private lateinit var allScansAdapter: FirestoreRecyclerAdapter<Scan, ScanCardViewHolder>
     private lateinit var searchAdapter: RecyclerView.Adapter<ScanCardViewHolder>
-    private val scansMap = HashMap<String, Scan>()
+    private val scansMap = HashMap<String, ArrayList<Scan>>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -89,10 +89,11 @@ class ScanListActivity : AppCompatActivity() {
 
         allScansAdapter.stopListening()
 
-        //TODO: change this mapping to descending order based on last activity of the chat
-        var i = 0
-        val filteredMap = scansMap.filterKeys { it.startsWith(query, ignoreCase = true) }
-            .mapKeys { i++ }
+        val filteredList = scansMap.filterKeys { it.startsWith(query, ignoreCase = true) }
+            .values
+            .flatten()
+
+        filteredList.sortedBy { it.timestamp } // observe that that Date implements Comparable!
 
         searchAdapter = object : RecyclerView.Adapter<ScanCardViewHolder>() {
             override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ScanCardViewHolder {
@@ -102,11 +103,11 @@ class ScanListActivity : AppCompatActivity() {
             }
 
             override fun getItemCount(): Int {
-                return filteredMap.size
+                return filteredList.size
             }
 
             override fun onBindViewHolder(holder: ScanCardViewHolder, position: Int) {
-                val scan = filteredMap.getValue(holder.adapterPosition)
+                val scan = filteredList[holder.adapterPosition]
                 Log.d(TAG, "Binding chat with the following data: $scan")
                 holder.bind(scan)
             }
@@ -159,7 +160,9 @@ class ScanListActivity : AppCompatActivity() {
                 scan: Scan
             ) {
                 holder.bind(scan)
-                scansMap[scan.scanName] = scan
+                if (scansMap[scan.scanName] == null)
+                    scansMap[scan.scanName] = ArrayList()
+                scansMap[scan.scanName]!!.add(scan)
             }
 
         }

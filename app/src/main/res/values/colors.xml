@@ -9,5 +9,6 @@
     <color name="colorToolbar">#2F2F2F</color>
     <color name="colorCard">#232423</color>
     <color name="colorDivider">#383939</color>
+    <color name="colorNestedAppBar">#505050</color>
     <color name="contour">#707070</color>
 </resources>
