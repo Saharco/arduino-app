@@ -5,6 +5,8 @@ import java.util.*
 
 data class Scan(val scanName: String,
                 val mapGridId: String,
+                val mapHeight: Int,
+                val mapWidth: Int,
                 val timestamp: Date,
                 val scanRadius: Float,
                 val floorResId: Int = R.drawable.floor_tile,

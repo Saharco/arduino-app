@@ -1,10 +1,10 @@
-package com.technion.columbus
+package com.technion.columbus.scans
 
 import android.content.Intent
-import android.graphics.drawable.Drawable
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
@@ -12,8 +12,8 @@ import android.widget.TextView
 import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.technion.columbus.R
 import kotlinx.android.synthetic.main.activity_scan_list.*
-import kotlinx.android.synthetic.main.scan_card.*
 
 class ScanListActivity : AppCompatActivity() {
 
@@ -51,12 +51,51 @@ class ScanListActivity : AppCompatActivity() {
         val catTile = applicationContext.resources.getIdentifier("cat_front", "drawable", applicationContext.packageName)
         val chickenTile = applicationContext.resources.getIdentifier("chicken_front", "drawable", applicationContext.packageName)
         val list = mutableListOf<ScanCardInfo>()
-        list.add(ScanCardInfo("Taub 9", "01/12/2019", "15:00", blackFloorTile, wallTile, dogTile))
-        list.add(ScanCardInfo("Ullman 614", "31/11/2019", "16:30", checkeredFloorTile, wallTile, catTile))
-        list.add(ScanCardInfo("Taub 313", "31/11/2019", "12:30", checkeredFloorTile, wallTile, chickenTile))
-        list.add(ScanCardInfo("My big and magnificent dormitory room with astonishing view to the Haifa bay",
-            "30/11/2019", "21:00", blackFloorTile, wallTile, catTile))
+        list.add(
+            ScanCardInfo(
+                "Taub 9",
+                "01/12/2019",
+                "15:00",
+                blackFloorTile,
+                wallTile,
+                dogTile
+            )
+        )
+        list.add(
+            ScanCardInfo(
+                "Ullman 614",
+                "31/11/2019",
+                "16:30",
+                checkeredFloorTile,
+                wallTile,
+                catTile
+            )
+        )
+        list.add(
+            ScanCardInfo(
+                "Taub 313",
+                "31/11/2019",
+                "12:30",
+                checkeredFloorTile,
+                wallTile,
+                chickenTile
+            )
+        )
+        list.add(
+            ScanCardInfo(
+                "My big and magnificent dormitory room with astonishing view to the Haifa bay",
+                "30/11/2019", "21:00", blackFloorTile, wallTile, catTile
+            )
+        )
         return list
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            android.R.id.home ->
+                onBackPressed()
+        }
+        return super.onOptionsItemSelected(item)
     }
 }
 

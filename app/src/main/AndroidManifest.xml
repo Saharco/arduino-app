@@ -14,10 +14,10 @@
             android:name=".LoginActivity"
             android:launchMode="singleTop" />
         <activity
-            android:name=".ScanInfoActivity"
+            android:name=".scans.ScanInfoActivity"
             android:launchMode="singleTop" />
         <activity
-            android:name=".ScanListActivity"
+            android:name=".scans.ScanListActivity"
             android:launchMode="singleTop" />
         <activity
             android:name=".main.MainActivity"

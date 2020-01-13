@@ -30,6 +30,7 @@ class GameMapActivity : AndroidApplication() {
 
     private val db = FirebaseFirestore.getInstance()
 
+    private val game = MapScreen()
     private var scanName: String? = null
     private var mapScanMode :MapScanMode? = null
     private var scanRadius: Float? = null
@@ -41,23 +42,12 @@ class GameMapActivity : AndroidApplication() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_game_map)
 
-        // fetch all the scan parameters
-        scanName = intent.getStringExtra(SCAN_NAME)
-        mapScanMode = intent.getSerializableExtra(MAP_SCAN_MODE) as MapScanMode
-        scanRadius = intent.getFloatExtra(SCAN_RADIUS, 1f)
-        chosenFloorTile = intent.getIntExtra(CHOSEN_FLOOR_TILE, R.drawable.floor_tile)
-        chosenWallTile = intent.getIntExtra(CHOSEN_WALL_TILE, R.drawable.wall_tile)
-        chosenRobotTile = intent.getIntExtra(CHOSEN_ROBOT_TILE, R.drawable.dog_front_idle)
+        fetchIntentData()
+        displayGameWindow()
+        setGameListeners()
+    }
 
-        // start the game window
-        val gameFrame = gameMapView
-        val game = MapScreen()
-        val gameView = initializeForView(game)
-
-
-        // add game window to GUI
-        gameFrame.addView(gameView)
-
+    private fun setGameListeners() {
         disposeScanButton.setOnClickListener {
             onBackPressed()
         }
@@ -71,7 +61,6 @@ class GameMapActivity : AndroidApplication() {
 
             progressDialog.isIndeterminate = true
 
-            //FIXME: need to create an AsyncTask that will: 1. stop listening for changes via network in the game. 2. get the tilemap from the game. 3. upload the tilemap to firebase. 4. start the next activity
             val map = MapMatrix(game.map.height, game.map.width, game.map.asMatrix())
             db.collection("mapGrids")
                 .add(map) // check if this is fine
@@ -79,6 +68,8 @@ class GameMapActivity : AndroidApplication() {
                     val scan = Scan(
                         scanName!!,
                         it.id,
+                        map.rows,
+                        map.cols,
                         Date(System.currentTimeMillis()),
                         scanRadius!!,
                         chosenFloorTile!!,
@@ -94,58 +85,33 @@ class GameMapActivity : AndroidApplication() {
                 }
         }
 
-//
-//        val listener = object : ApplicationListener {
-//
-//            private lateinit var batch: SpriteBatch
-//            private lateinit var map: ArduinoMap
-//            private lateinit var camera: OrthographicCamera
-//
-//            override fun create() {
-//                Gdx.app.logLevel = Application.LOG_DEBUG
-//                batch = SpriteBatch()
-//
-//                camera = OrthographicCamera()
-//                camera.setToOrtho(false, Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat())
-//                camera.update()
-//
-//                map = ArduinoMap()
-//            }
-//
-//            override fun dispose() {
-//                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-//            }
-//
-//            override fun render() {
-//                Gdx.gl.glClearColor(0.125f, 0.125f, 0.125f, 0.05f)
-//                Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
-//
-//                if (Gdx.input.isTouched) {
-//                    camera.translate(-Gdx.input.deltaX.toFloat(), Gdx.input.deltaY.toFloat())
-//                    camera.update()
-//                }
-//
-//                if (Gdx.input.justTouched()) {
-//                    val tilePosition = camera.unproject(Vector3(Gdx.input.x.toFloat(), Gdx.input.y.toFloat(), 0f))
-//                    val tileType = map.getTileTypeByPixelLocation(0, tilePosition.x, tilePosition.y)
-//                    if (tileType != null) {
-//                        Gdx.app.log(MainActivity.TAG, "clicked on tile: ${tileType.name}")
-//                    }
-//                }
-//
-//                map.render(camera)
-//            }
-//
-//            override fun pause() {
-//            }
-//
-//            override fun resume() {
-//            }
-//
-//            override fun resize(width: Int, height: Int) {
-//            }
-//
-//        }
+        //        val listener = object : ApplicationListener {
+        //            override fun create() {}
+        //
+        //            override fun dispose() {}
+        //
+        //            override fun render() {}
+        //
+        //            override fun pause() {}
+        //
+        //            override fun resume() {}
+        //
+        //            override fun resize(width: Int, height: Int) {}
+        //        }
+    }
+
+    private fun displayGameWindow() {
+        val gameView = initializeForView(game)
+        gameMapView.addView(gameView)
+    }
+
+    private fun fetchIntentData() {
+        scanName = intent.getStringExtra(SCAN_NAME)
+        mapScanMode = intent.getSerializableExtra(MAP_SCAN_MODE) as MapScanMode
+        scanRadius = intent.getFloatExtra(SCAN_RADIUS, 1f)
+        chosenFloorTile = intent.getIntExtra(CHOSEN_FLOOR_TILE, R.drawable.floor_tile)
+        chosenWallTile = intent.getIntExtra(CHOSEN_WALL_TILE, R.drawable.wall_tile)
+        chosenRobotTile = intent.getIntExtra(CHOSEN_ROBOT_TILE, R.drawable.dog_front_idle)
     }
 
     private fun displayFinishedScanDialog() {

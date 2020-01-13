@@ -17,7 +17,7 @@ import com.robinhood.ticker.TickerUtils
 import com.robinhood.ticker.TickerView
 import com.technion.columbus.map.GameMapActivity
 import com.technion.columbus.R
-import com.technion.columbus.ScanListActivity
+import com.technion.columbus.scans.ScanListActivity
 import com.technion.columbus.pojos.MapScanMode
 import com.technion.columbus.utility.*
 import kotlinx.android.synthetic.main.activity_main.*
@@ -180,5 +180,8 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun seekBarProgressToScanRadius(progress: Int) = progress.toFloat() / 100 + 1
+    /**
+     * Converts the SeekBar's progress value to an appropriate scan radius (minimum is 0.5 meters)
+     */
+    private fun seekBarProgressToScanRadius(progress: Int) = progress.toFloat() / 100 + 0.5
 }
