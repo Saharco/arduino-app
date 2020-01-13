@@ -1,7 +1,6 @@
 package com.technion.columbus.scans
 
 import android.annotation.SuppressLint
-import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
@@ -13,11 +12,11 @@ import com.firebase.ui.firestore.FirestoreRecyclerAdapter
 import com.firebase.ui.firestore.FirestoreRecyclerOptions
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
+import com.miguelcatalan.materialsearchview.MaterialSearchView
 import com.technion.columbus.R
 import com.technion.columbus.pojos.Scan
-import com.technion.columbus.utility.stringToTileResource
+import com.technion.columbus.utility.hideKeyboard
 import kotlinx.android.synthetic.main.activity_scan_list.*
-import java.text.SimpleDateFormat
 import java.util.*
 
 class ScanListActivity : AppCompatActivity() {
@@ -29,8 +28,10 @@ class ScanListActivity : AppCompatActivity() {
     private lateinit var recyclerView: RecyclerView
 
     private val db = FirebaseFirestore.getInstance()
+
     private lateinit var allScansAdapter: FirestoreRecyclerAdapter<Scan, ScanCardViewHolder>
     private lateinit var searchAdapter: RecyclerView.Adapter<ScanCardViewHolder>
+    private val scansMap = HashMap<String, Scan>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -48,9 +49,71 @@ class ScanListActivity : AppCompatActivity() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.setDisplayShowTitleEnabled(false)
 
+        configureSearchView()
+    }
+
+    private fun configureSearchView() {
         searchView.background = ContextCompat.getDrawable(this, R.drawable.search_background)
         searchView.setBackIcon(getDrawable(R.drawable.ic_arrow_back_white_24dp))
         searchView.setTextColor(ContextCompat.getColor(this, R.color.colorText))
+
+        searchView.setOnSearchViewListener(object : MaterialSearchView.SearchViewListener {
+            override fun onSearchViewClosed() {
+                // do nothing
+            }
+
+            override fun onSearchViewShown() {
+                searchView.setOnQueryTextListener(object : MaterialSearchView.OnQueryTextListener {
+
+                    override fun onQueryTextSubmit(query: String?): Boolean {
+                        Log.i(TAG, "search bar #textSubmit: $query")
+                        hideKeyboard(this@ScanListActivity)
+                        return true
+                    }
+
+                    override fun onQueryTextChange(newText: String?): Boolean {
+                        if (newText == null || newText == "") {
+                            showAllScans()
+                        }
+                        else
+                            showFilteredScans(newText)
+                        return false
+                    }
+                })
+            }
+        })
+    }
+
+    private fun showFilteredScans(query: String) {
+        Log.d(TAG, "changing to filtered query")
+
+        allScansAdapter.stopListening()
+
+        //TODO: change this mapping to descending order based on last activity of the chat
+        var i = 0
+        val filteredMap = scansMap.filterKeys { it.startsWith(query, ignoreCase = true) }
+            .mapKeys { i++ }
+
+        searchAdapter = object : RecyclerView.Adapter<ScanCardViewHolder>() {
+            override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ScanCardViewHolder {
+                val itemView =
+                    LayoutInflater.from(parent.context).inflate(R.layout.scan_card, parent, false)
+                return ScanCardViewHolder(itemView)
+            }
+
+            override fun getItemCount(): Int {
+                return filteredMap.size
+            }
+
+            override fun onBindViewHolder(holder: ScanCardViewHolder, position: Int) {
+                val scan = filteredMap.getValue(holder.adapterPosition)
+                Log.d(TAG, "Binding chat with the following data: $scan")
+                holder.bind(scan)
+            }
+        }
+
+        recyclerView.layoutManager = LinearLayoutManager(this)
+        recyclerView.adapter = searchAdapter
     }
 
     override fun onStart() {
@@ -60,7 +123,7 @@ class ScanListActivity : AppCompatActivity() {
 
     override fun onStop() {
         super.onStop()
-        //searchView.closeSearch()
+        searchView.closeSearch()
         allScansAdapter.stopListening()
     }
 
@@ -95,20 +158,8 @@ class ScanListActivity : AppCompatActivity() {
                 position: Int,
                 scan: Scan
             ) {
-                val dateFormat = SimpleDateFormat("dd.MM.yyyy")
-                val hourFormat = SimpleDateFormat("HH:mm")
-                val date = Date(scan.timestamp!!.time)
-
-                holder.scanTitle.text = scan.scanName
-                holder.scanDate.text = dateFormat.format(date)
-                holder.scanTime.text = hourFormat.format(date)
-                holder.floorTile.setImageResource(stringToTileResource(scan.floorTileName))
-                holder.wallTile.setImageResource(stringToTileResource(scan.wallTileName))
-                holder.robotTile.setImageResource(stringToTileResource(scan.robotTileName))
-                holder.card.setOnClickListener {
-                    val intent = Intent(it.context, ScanInfoActivity::class.java)
-                    it.context.startActivity(intent)
-                }
+                holder.bind(scan)
+                scansMap[scan.scanName] = scan
             }
 
         }
@@ -127,5 +178,12 @@ class ScanListActivity : AppCompatActivity() {
                 onBackPressed()
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    override fun onBackPressed() {
+        if (searchView.isSearchOpen)
+            searchView.closeSearch()
+        else
+            super.onBackPressed()
     }
 }

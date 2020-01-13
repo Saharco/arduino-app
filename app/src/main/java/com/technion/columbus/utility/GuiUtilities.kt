@@ -4,6 +4,7 @@ import android.app.Activity
 import android.os.Build
 import android.view.View
 import android.view.WindowManager
+import android.view.inputmethod.InputMethodManager
 import com.google.android.material.snackbar.Snackbar
 
 /**
@@ -32,4 +33,20 @@ fun makeHighlightedSnackbar(root: View, msg: String) {
 //        snackbar.view.findViewById<TextView>(com.google.android.material.R.id.snackbar_text)
 //    textView.setTextColor(Color.YELLOW)
     snackbar.show()
+}
+
+/**
+ * Hides the virtual keyboard in the activity, if it is open
+ *
+ * @param activity: activity in which the keyboard should be hidden
+ */
+fun hideKeyboard(activity: Activity) {
+    val imm = activity
+        .getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
+    var view = activity.currentFocus
+    if (view == null) {
+        // There is no view to pass the focus to, so we create a new view
+        view = View(activity)
+    }
+    imm.hideSoftInputFromWindow(view.windowToken, 0)
 }
