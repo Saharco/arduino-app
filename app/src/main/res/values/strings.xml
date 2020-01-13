@@ -33,5 +33,7 @@
     <string name="upload_success_ok">Awesome!</string>
 
     <!--    Scan List strings   -->
+    <string name="previous_scans_title">Previous Scans</string>
+    <string name="search_option_title">Search</string>
     <string name="empty_feed_text">No scans available</string>
 </resources>

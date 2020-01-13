@@ -5,10 +5,8 @@ import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
-import android.view.LayoutInflater
-import android.view.MenuItem
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.firebase.ui.firestore.FirestoreRecyclerAdapter
@@ -28,7 +26,6 @@ class ScanListActivity : AppCompatActivity() {
     }
 
     private lateinit var recyclerView: RecyclerView
-    private lateinit var emptyListView: View
 
     private val db = FirebaseFirestore.getInstance()
     private lateinit var allScansAdapter: FirestoreRecyclerAdapter<Scan, ScanCardViewHolder>
@@ -38,7 +35,6 @@ class ScanListActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_scan_list)
 
-        emptyListView = findViewById(R.id.empty_feed_view)
         val viewManager = LinearLayoutManager(this)
         viewManager.orientation = LinearLayoutManager.VERTICAL
 
@@ -47,8 +43,12 @@ class ScanListActivity : AppCompatActivity() {
         }
 
         setSupportActionBar(previousScansToolbar)
+        supportActionBar?.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white_24dp)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        supportActionBar?.setDisplayShowHomeEnabled(true)
+        supportActionBar?.setDisplayShowTitleEnabled(false)
+
+        searchView.background = ContextCompat.getDrawable(this, R.drawable.search_background)
+        searchView.setBackIcon(getDrawable(R.drawable.ic_arrow_back_white_24dp))
     }
 
     override fun onStart() {
@@ -110,6 +110,13 @@ class ScanListActivity : AppCompatActivity() {
             }
 
         }
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        val inflater: MenuInflater = menuInflater
+        inflater.inflate(R.menu.previous_scans_menu, menu)
+        searchView.setMenuItem(menu.findItem(R.id.search))
+        return true
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
