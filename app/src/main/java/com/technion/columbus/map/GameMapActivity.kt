@@ -4,9 +4,12 @@ import android.app.ProgressDialog
 import android.content.Intent
 import android.graphics.Typeface
 import android.os.Bundle
+import android.util.Log
 import android.view.Gravity
 import android.widget.Button
+import android.view.MotionEvent
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import com.afollestad.materialdialogs.MaterialDialog
@@ -24,9 +27,21 @@ import com.technion.columbus.pojos.Scan
 import com.technion.columbus.utility.*
 import it.emperor.animatedcheckbox.AnimatedCheckBox
 import kotlinx.android.synthetic.main.activity_game_map.*
+import java.io.IOException
+import java.net.InetAddress
+import java.net.Socket
+import java.net.UnknownHostException
 import java.util.*
+import kotlin.concurrent.thread
 
 class GameMapActivity : AndroidApplication() {
+
+    companion object {
+        const val TAG = "GameMapActivity"
+
+        const val RPI_ADDRESS = "192.168.1.20"
+        const val RPI_PORT = 50007
+    }
 
     private val db = FirebaseFirestore.getInstance()
 
@@ -48,7 +63,7 @@ class GameMapActivity : AndroidApplication() {
 
         fetchIntentData()
         displayGameWindow()
-        setGameListeners()
+        setButtons()
         configureFocusButton()
 
         //TODO: delete this when the real map data is being fetched correctly
@@ -76,62 +91,8 @@ class GameMapActivity : AndroidApplication() {
         }
     }
 
-    private fun setGameListeners() {
-        disposeScanButton.setOnClickListener {
-            onBackPressed()
-        }
-
-        finishScanButton.setOnClickListener {
-            val progressDialog = ProgressDialog.show(
-                this@GameMapActivity,
-                getString(R.string.scan_upload_title),
-                getString(R.string.loading_scan_upload_message)
-            )
-
-            progressDialog.isIndeterminate = true
-
-            val mapGridId = "${System.currentTimeMillis()}${UUID.randomUUID()}"
-
-            val storageRef = FirebaseStorage.getInstance()
-                .reference
-                .child("map_grids")
-                .child(mapGridId)
-            val bytes = mapMatrix.serialize()
-            storageRef.putBytes(bytes)
-                .addOnSuccessListener {
-                    val scan = Scan(
-                        scanName!!,
-                        mapGridId,
-                        mapMatrix.rows,
-                        mapMatrix.cols,
-                        Date(System.currentTimeMillis()),
-                        scanRadius!!,
-                        chosenFloorTile!!,
-                        chosenWallTile!!,
-                        chosenRobotTile!!
-                    )
-                    db.collection("scans")
-                        .add(scan)
-                        .addOnSuccessListener {
-                            progressDialog.dismiss()
-                            displayFinishedScanDialog()
-                        }
-                }
-        }
-
-        //        val listener = object : ApplicationListener {
-        //            override fun create() {}
-        //
-        //            override fun dispose() {}
-        //
-        //            override fun render() {}
-        //
-        //            override fun pause() {}
-        //
-        //            override fun resume() {}
-        //
-        //            override fun resize(width: Int, height: Int) {}
-        //        }
+    private fun setButtons() {
+        thread { ClientThread( RPI_ADDRESS, RPI_PORT).configure() }
     }
 
     private fun displayGameWindow() {
@@ -195,5 +156,128 @@ class GameMapActivity : AndroidApplication() {
             .show()
         builder.create()
         return
+    }
+
+    inner class ClientThread(address: String, port: Int) {
+        lateinit var socket: Socket
+
+        init {
+            try {
+                val serverAddr = InetAddress.getByName(address)
+                socket = Socket(serverAddr, port)
+                Log.d(TAG, "Connected to the socket")
+            } catch(e: UnknownHostException) {
+                Log.d(TAG, "Caught UnknownHostException")
+                e.printStackTrace()
+            } catch (e: IOException) {
+                Log.d(TAG, "Caught IOException")
+                e.printStackTrace()
+            } catch (e: Exception) {
+                Log.d(TAG, "Caught some other exception")
+                e.printStackTrace()
+            }
+        }
+
+        private fun sendAction(action: String) {
+            Log.d(TAG, "Action: $action")
+            try {
+                socket.getOutputStream().write(action.toByteArray())
+            } catch (e: IOException) {
+                Log.d(TAG, "Caught an IOException while sending data")
+            } catch (e: Exception) {
+                Log.d(TAG, "Caught some other exception while sending data: " + e.cause)
+            }
+        }
+
+        private fun setGameListeners() {
+            disposeScanButton.setOnClickListener {
+                socket.close()
+                onBackPressed()
+            }
+
+            finishScanButton.setOnClickListener {
+                socket.close()
+                val progressDialog = ProgressDialog.show(
+                    this@GameMapActivity,
+                    getString(R.string.scan_upload_title),
+                    getString(R.string.loading_scan_upload_message)
+                )
+
+                progressDialog.isIndeterminate = true
+
+                val map = MapMatrix(game.map.height, game.map.width, game.map.asMatrix())
+                db.collection("mapGrids")
+                    .add(map) // check if this is fine
+                    .addOnSuccessListener {
+                        val scan = Scan(
+                            scanName!!,
+                            it.id,
+                            map.rows,
+                            map.cols,
+                            Date(System.currentTimeMillis()),
+                            scanRadius!!,
+                            chosenFloorTile!!,
+                            chosenWallTile!!,
+                            chosenRobotTile!!
+                        )
+                        db.collection("scans")
+                            .add(scan) // check if this is fine
+                            .addOnSuccessListener {
+                                progressDialog.dismiss()
+                                displayFinishedScanDialog()
+                            }
+                    }
+            }
+
+            //        val listener = object : ApplicationListener {
+            //            override fun create() {}
+            //
+            //            override fun dispose() {}
+            //
+            //            override fun render() {}
+            //
+            //            override fun pause() {}
+            //
+            //            override fun resume() {}
+            //
+            //            override fun resize(width: Int, height: Int) {}
+            //        }
+        }
+
+        fun configure() {
+            Log.d(TAG, "Started configuring buttons")
+            moveUp.setOnTouchListener { _, event ->
+                when (event.action) {
+                    MotionEvent.ACTION_DOWN -> thread { sendAction("f") }
+                    MotionEvent.ACTION_UP -> thread { sendAction("n") }
+                }
+                true
+            }
+            moveLeft.setOnTouchListener { _, event ->
+                when (event.action) {
+                    MotionEvent.ACTION_DOWN -> thread { sendAction("l") }
+                    MotionEvent.ACTION_UP -> thread { sendAction("n") }
+                }
+                true
+            }
+            moveRight.setOnTouchListener { _, event ->
+                when (event.action) {
+                    MotionEvent.ACTION_DOWN -> thread { sendAction("r") }
+                    MotionEvent.ACTION_UP -> thread { sendAction("n") }
+                }
+                true
+            }
+            moveDown.setOnTouchListener { _, event ->
+                when (event.action) {
+                    MotionEvent.ACTION_DOWN -> thread { sendAction("b") }
+                    MotionEvent.ACTION_UP -> thread { sendAction("n") }
+                }
+                true
+            }
+
+            setGameListeners()
+
+            Log.d(TAG, "Finished configuring buttons")
+        }
     }
 }
