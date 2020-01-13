@@ -14,8 +14,6 @@ import com.afollestad.materialdialogs.customview.customView
 import com.afollestad.materialdialogs.customview.getCustomView
 import com.badlogic.gdx.backends.android.AndroidApplication
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.model.value.ServerTimestampValue
-import com.google.firestore.v1.DocumentTransform
 import com.technion.columbus.R
 import com.technion.columbus.main.MainActivity
 import com.technion.columbus.pojos.MapMatrix
@@ -34,9 +32,9 @@ class GameMapActivity : AndroidApplication() {
     private var scanName: String? = null
     private var mapScanMode :MapScanMode? = null
     private var scanRadius: Float? = null
-    private var chosenFloorTile: Int? = null
-    private var chosenWallTile: Int? = null
-    private var chosenRobotTile: Int? = null
+    private var chosenFloorTile: String? = null
+    private var chosenWallTile: String? = null
+    private var chosenRobotTile: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -109,9 +107,9 @@ class GameMapActivity : AndroidApplication() {
         scanName = intent.getStringExtra(SCAN_NAME)
         mapScanMode = intent.getSerializableExtra(MAP_SCAN_MODE) as MapScanMode
         scanRadius = intent.getFloatExtra(SCAN_RADIUS, 1f)
-        chosenFloorTile = intent.getIntExtra(CHOSEN_FLOOR_TILE, R.drawable.floor_tile)
-        chosenWallTile = intent.getIntExtra(CHOSEN_WALL_TILE, R.drawable.wall_tile)
-        chosenRobotTile = intent.getIntExtra(CHOSEN_ROBOT_TILE, R.drawable.dog_front_idle)
+        chosenFloorTile = intent.getStringExtra(CHOSEN_FLOOR_TILE)
+        chosenWallTile = intent.getStringExtra(CHOSEN_WALL_TILE)
+        chosenRobotTile = intent.getStringExtra(CHOSEN_ROBOT_TILE)
     }
 
     private fun displayFinishedScanDialog() {

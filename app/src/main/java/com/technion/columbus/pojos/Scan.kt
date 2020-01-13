@@ -1,6 +1,7 @@
 package com.technion.columbus.pojos
 
 import com.technion.columbus.R
+import com.technion.columbus.utility.*
 import java.util.*
 
 data class Scan(val scanName: String = "",
@@ -9,6 +10,6 @@ data class Scan(val scanName: String = "",
                 val mapWidth: Int = 0,
                 val timestamp: Date? = null,
                 val scanRadius: Float = 0f,
-                val floorResId: Int = R.drawable.floor_tile,
-                val wallResId: Int = R.drawable.wall_tile,
-                val robotResId: Int = R.drawable.dog_front_idle)
+                val floorTileName: String = FLOOR_BLACK,
+                val wallTileName: String = WALL_WOOD_1,
+                val robotTileName: String = PLAYER_DOG)

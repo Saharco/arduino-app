@@ -135,9 +135,15 @@ class MainActivity : AppCompatActivity() {
             startGameIntent.putExtra(SCAN_NAME, name.toString())
             startGameIntent.putExtra(MAP_SCAN_MODE, mapScanMode)
             startGameIntent.putExtra(SCAN_RADIUS, scanRadius)
-            startGameIntent.putExtra(CHOSEN_FLOOR_TILE, floorSlotPicker.tileId)
-            startGameIntent.putExtra(CHOSEN_WALL_TILE, wallSlotPicker.tileId)
-            startGameIntent.putExtra(CHOSEN_ROBOT_TILE, robotSlotPicker.tileId)
+            startGameIntent.putExtra(
+                CHOSEN_FLOOR_TILE,
+                tileResourceToString(floorSlotPicker.tileId)
+            )
+            startGameIntent.putExtra(CHOSEN_WALL_TILE, tileResourceToString(wallSlotPicker.tileId))
+            startGameIntent.putExtra(
+                CHOSEN_ROBOT_TILE,
+                tileResourceToString(robotSlotPicker.tileId)
+            )
             startActivity(startGameIntent)
             dialog.dismiss()
         }

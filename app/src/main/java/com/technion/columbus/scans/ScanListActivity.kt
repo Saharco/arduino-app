@@ -15,6 +15,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 import com.technion.columbus.R
 import com.technion.columbus.pojos.Scan
+import com.technion.columbus.utility.stringToTileResource
 import kotlinx.android.synthetic.main.activity_scan_list.*
 import java.text.SimpleDateFormat
 import java.util.*
@@ -101,9 +102,9 @@ class ScanListActivity : AppCompatActivity() {
                 holder.scanTitle.text = scan.scanName
                 holder.scanDate.text = dateFormat.format(date)
                 holder.scanTime.text = hourFormat.format(date)
-                holder.floorTile.setImageResource(scan.floorResId)
-                holder.wallTile.setImageResource(scan.wallResId)
-                holder.robotTile.setImageResource(scan.robotResId)
+                holder.floorTile.setImageResource(stringToTileResource(scan.floorTileName))
+                holder.wallTile.setImageResource(stringToTileResource(scan.wallTileName))
+                holder.robotTile.setImageResource(stringToTileResource(scan.robotTileName))
                 holder.card.setOnClickListener {
                     val intent = Intent(it.context, ScanInfoActivity::class.java)
                     it.context.startActivity(intent)

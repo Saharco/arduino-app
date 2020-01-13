@@ -1,11 +1,9 @@
 package com.technion.columbus.utility
 
 import android.app.Activity
-import android.graphics.Color
 import android.os.Build
 import android.view.View
 import android.view.WindowManager
-import android.widget.TextView
 import com.google.android.material.snackbar.Snackbar
 
 /**
