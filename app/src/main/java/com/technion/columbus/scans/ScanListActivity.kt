@@ -161,9 +161,9 @@ class ScanListActivity : AppCompatActivity() {
                 holder.bind(scan)
                 if (scansMap[scan.scanName] == null)
                     scansMap[scan.scanName] = ArrayList()
-                scansMap[scan.scanName]!!.add(scan)
+                if (!scansMap[scan.scanName]!!.contains(scan))
+                    scansMap[scan.scanName]!!.add(scan)
             }
-
         }
     }
 
