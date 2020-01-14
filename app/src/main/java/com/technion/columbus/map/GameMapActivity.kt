@@ -29,6 +29,7 @@ class GameMapActivity : AndroidApplication() {
     private val db = FirebaseFirestore.getInstance()
 
     private val game = MapScreen()
+
     private var scanName: String? = null
     private var mapScanMode :MapScanMode? = null
     private var scanRadius: Float? = null

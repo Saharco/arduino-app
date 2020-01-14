@@ -1,214 +1,181 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".scans.ScanInfoActivity">
 
-    <com.google.android.material.appbar.AppBarLayout
-        android:id="@+id/toolbarLayout"
+    <FrameLayout
+        android:id="@+id/gameMapView"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:theme="@style/AppTheme.AppBarOverlay"
-        android:background="@color/colorToolbar"
-        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_height="0dp"
+        android:background="@color/colorDivider"
+        app:layout_constraintBottom_toTopOf="@id/scan_card"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/backButton"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_marginStart="4dp"
+        android:layout_marginTop="8dp"
+        android:background="@android:color/transparent"
+        android:drawableTop="@drawable/ic_arrow_back_white_24dp"
+        android:tint="@color/colorPrimary"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toTopOf="parent" />
 
-        <com.google.android.material.appbar.MaterialToolbar
-            android:id="@+id/scanInfoToolbar"
-            android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            app:popupTheme="@style/AppTheme.PopupOverlay" >
-
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent" >
-
-                <TextView
-                    android:id="@+id/toolbarTitle"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:layout_marginBottom="8dp"
-                    android:gravity="start"
-                    android:maxLines="1"
-                    android:textAlignment="viewStart"
-                    android:textSize="20sp"
-                    android:textStyle="bold"
-                    app:autoSizeMaxTextSize="20sp"
-                    app:autoSizeMinTextSize="12sp"
-                    app:autoSizeTextType="uniform"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    android:text="Scan Information"
-                    android:textColor="@color/colorText" />
-
-            </androidx.constraintlayout.widget.ConstraintLayout>
-
-        </com.google.android.material.appbar.MaterialToolbar>
-
-    </com.google.android.material.appbar.AppBarLayout>
-
-    <androidx.core.widget.NestedScrollView
+    <androidx.cardview.widget.CardView
+        android:id="@+id/scan_card"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:fillViewport="true"
-        app:layout_constraintTop_toBottomOf="@id/toolbarLayout"
-        app:layout_constraintBottom_toBottomOf="parent">
+        android:layout_height="192dp"
+        app:cardBackgroundColor="@color/colorCard"
+        app:cardCornerRadius="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-            <ImageView
-                android:id="@+id/placeholder_imageview"
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:background="@color/surface"
-                app:layout_constraintTop_toTopOf="parent"/>
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/scan_title"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:layout_marginStart="16dp"
+                android:layout_marginLeft="16dp"
+                android:layout_marginTop="12dp"
+                android:layout_marginEnd="16dp"
+                android:layout_marginRight="16dp"
+                android:gravity="top"
+                android:maxLines="2"
+                android:paddingStart="12dp"
+                android:paddingEnd="12dp"
+                android:textColor="@color/colorText"
+                android:textSize="24sp"
+                android:textStyle="bold"
+                app:autoSizeMaxTextSize="24sp"
+                app:autoSizeMinTextSize="16sp"
+                app:autoSizeTextType="uniform"
+                app:layout_constraintEnd_toStartOf="@id/options_tiles_layout"
+                app:layout_constraintHorizontal_bias="0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
-            <ImageView
-                android:id="@+id/image_layout"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                app:layout_constraintTop_toBottomOf="@id/placeholder_imageview"
-                app:layout_constraintBottom_toTopOf="@id/info_layout"
-                app:layout_constraintVertical_weight="2"
-                android:background="@color/surface"
-                android:src="@drawable/scan_sample_surface_background"/>
+            <View
+                android:id="@+id/divider"
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                android:layout_marginStart="12dp"
+                android:layout_marginTop="14dp"
+                android:layout_marginEnd="42dp"
+                android:background="@color/colorDivider"
+                app:layout_constraintEnd_toStartOf="@id/options_tiles_layout"
+                app:layout_constraintStart_toStartOf="@id/scan_title"
+                app:layout_constraintTop_toBottomOf="@+id/scan_title" />
 
             <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/info_layout"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                app:layout_constraintTop_toBottomOf="@id/image_layout"
+                android:id="@+id/date_and_time_layout"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 app:layout_constraintBottom_toBottomOf="parent"
-                android:background="@color/colorCard"
-                app:layout_constraintVertical_weight="1">
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/divider">
+
+                <ImageView
+                    android:id="@+id/date_logo"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="16dp"
+                    android:layout_marginTop="4dp"
+                    android:layout_marginRight="16dp"
+                    android:padding="12dp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:srcCompat="@drawable/ic_date" />
 
                 <TextView
-                    android:id="@+id/scan_title"
+                    android:id="@+id/date_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    android:layout_marginStart="16dp"
-                    android:layout_marginTop="8dp"
                     android:padding="12dp"
-                    android:textSize="24sp"
-                    android:textStyle="bold"
-                    android:text="Taub 9"
-                    android:textColor="@color/colorText"/>
+                    android:textColor="@color/colorText"
+                    android:textSize="16sp"
+                    app:layout_constraintBottom_toBottomOf="@id/date_logo"
+                    app:layout_constraintStart_toEndOf="@id/date_logo"
+                    app:layout_constraintTop_toTopOf="@id/date_logo" />
 
-                <androidx.constraintlayout.widget.ConstraintLayout
-                    android:id="@+id/date_and_time_layout"
+
+                <ImageView
+                    android:id="@+id/time_logo"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    app:layout_constraintTop_toBottomOf="@id/scan_title"
-                    app:layout_constraintStart_toStartOf="parent">
+                    android:layout_marginLeft="16dp"
+                    android:layout_marginRight="16dp"
+                    android:padding="12dp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/date_logo"
+                    app:srcCompat="@drawable/ic_time" />
 
-                    <ImageView
-                        android:id="@+id/date_logo"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        app:srcCompat="@drawable/ic_date"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        android:layout_marginTop="4dp"
-                        android:layout_marginLeft="16dp"
-                        android:layout_marginRight="16dp"
-                        android:padding="12dp"/>
-
-                    <TextView
-                        android:id="@+id/date_text"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        app:layout_constraintStart_toEndOf="@id/date_logo"
-                        app:layout_constraintTop_toTopOf="@id/date_logo"
-                        app:layout_constraintBottom_toBottomOf="@id/date_logo"
-                        android:text="01/12/2019"
-                        android:textColor="@color/colorText"
-                        android:padding="12dp"
-                        android:textSize="16sp" />
-
-
-                    <ImageView
-                        android:id="@+id/time_logo"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        app:srcCompat="@drawable/ic_time"
-                        app:layout_constraintTop_toBottomOf="@id/date_logo"
-                        app:layout_constraintStart_toStartOf="parent"
-                        android:layout_marginLeft="16dp"
-                        android:layout_marginRight="16dp"
-                        android:padding="12dp"/>
-
-                    <TextView
-                        android:id="@+id/time_text"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        app:layout_constraintStart_toEndOf="@id/time_logo"
-                        app:layout_constraintTop_toTopOf="@id/time_logo"
-                        app:layout_constraintBottom_toBottomOf="@id/time_logo"
-                        android:text="15:00"
-                        android:textColor="@color/colorText"
-                        android:padding="12dp"
-                        android:textSize="16sp" />
-
-                </androidx.constraintlayout.widget.ConstraintLayout>
-
-                <androidx.constraintlayout.widget.ConstraintLayout
-                    android:id="@+id/options_tiles_layout"
+                <TextView
+                    android:id="@+id/time_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginEnd="24dp"
-                    app:layout_constraintStart_toEndOf="@id/date_and_time_layout"
+                    android:padding="12dp"
+                    android:textColor="@color/colorText"
+                    android:textSize="16sp"
+                    app:layout_constraintBottom_toBottomOf="@id/time_logo"
+                    app:layout_constraintStart_toEndOf="@id/time_logo"
+                    app:layout_constraintTop_toTopOf="@id/time_logo" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/options_tiles_layout"
+                android:layout_width="wrap_content"
+                android:layout_height="0dp"
+                android:layout_marginEnd="12dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="1"
+                app:layout_constraintStart_toEndOf="@id/date_and_time_layout"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <ImageView
+                    android:id="@+id/floor_tile"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:layout_marginTop="12dp"
+                    android:adjustViewBounds="true"
+                    android:cropToPadding="true"
+                    android:scaleType="fitCenter"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <ImageView
+                    android:id="@+id/wall_tile"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:layout_marginTop="12dp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/floor_tile" />
+
+                <ImageView
+                    android:id="@+id/robot_tile"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:layout_marginTop="12dp"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintBottom_toBottomOf="@id/date_and_time_layout"
-                    app:layout_constraintTop_toTopOf="@id/scan_title"
-                    app:layout_constraintHorizontal_bias="1">
-
-                    <ImageView
-                        android:id="@+id/tile1"
-                        android:layout_width="48dp"
-                        android:layout_height="48dp"
-                        android:adjustViewBounds="true"
-                        android:cropToPadding="true"
-                        android:scaleType="fitCenter"
-                        android:background="@drawable/floor_tile"
-                        android:layout_marginTop="12dp"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent" />
-
-                    <ImageView
-                        android:id="@+id/tile2"
-                        android:layout_width="48dp"
-                        android:layout_height="48dp"
-                        android:layout_marginTop="12dp"
-                        android:background="@drawable/wall_tile"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@id/tile1" />
-
-                    <ImageView
-                        android:id="@+id/tile3"
-                        android:layout_width="48dp"
-                        android:layout_height="48dp"
-                        android:background="@drawable/dog_front"
-                        android:layout_marginTop="12dp"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintTop_toBottomOf="@id/tile2" />
-
-                </androidx.constraintlayout.widget.ConstraintLayout>
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/wall_tile" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
-    </androidx.core.widget.NestedScrollView>
+    </androidx.cardview.widget.CardView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

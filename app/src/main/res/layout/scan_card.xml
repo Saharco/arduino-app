@@ -91,7 +91,7 @@
                     app:layout_constraintStart_toEndOf="@id/date_logo"
                     app:layout_constraintTop_toTopOf="@id/date_logo"
                     app:layout_constraintBottom_toBottomOf="@id/date_logo"
-                    android:text="DD/MM/YYYY"
+                    android:text="DD.MM.YYYY"
                     android:padding="12dp"
                     android:textSize="16sp"
                     android:textColor="@color/colorText"/>
