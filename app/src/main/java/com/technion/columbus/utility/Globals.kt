@@ -8,7 +8,7 @@ const val CHOSEN_WALL_TILE = "chosen-wall-tile"
 const val CHOSEN_ROBOT_TILE = "chosen-robot-tile"
 
 const val SCAN = "scan"
-const val MAP_MATRIX = "map-matrix"
+const val MAP_UPLOAD = "map-matrix"
 
 const val PLAYER_DOG = "player_dog"
 const val PLAYER_CAT = "player_cat"

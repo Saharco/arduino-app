@@ -5,6 +5,8 @@ import com.badlogic.gdx.maps.tiled.TiledMap
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer
 import com.badlogic.gdx.maps.tiled.TmxMapLoader
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer
+import com.technion.columbus.pojos.MapMatrix
+import com.technion.columbus.pojos.MapUpload
 
 class ArduinoMap : GameMap {
 
@@ -33,7 +35,9 @@ class ArduinoMap : GameMap {
         return TileType[id]
     }
 
-    fun asMatrix(): ArrayList<Int> {
-        return ArrayList()
+    fun asMapUpload(): MapUpload {
+        //TODO: implement the parsing logic
+        val tiles = ArrayList<ArrayList<Char>>()
+        return MapUpload(height, width, tiles)
     }
 }

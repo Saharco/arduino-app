@@ -31,7 +31,7 @@ class GameMapActivity : AndroidApplication() {
     private val game = MapScreen()
 
     private var scanName: String? = null
-    private var mapScanMode :MapScanMode? = null
+    private var mapScanMode: MapScanMode? = null
     private var scanRadius: Float? = null
     private var chosenFloorTile: String? = null
     private var chosenWallTile: String? = null
@@ -60,7 +60,7 @@ class GameMapActivity : AndroidApplication() {
 
             progressDialog.isIndeterminate = true
 
-            val map = MapMatrix(game.map.height, game.map.width, game.map.asMatrix())
+            val map = game.map.asMapUpload()
             db.collection("mapGrids")
                 .add(map) // check if this is fine
                 .addOnSuccessListener {
@@ -143,9 +143,12 @@ class GameMapActivity : AndroidApplication() {
         title.setText(R.string.dismiss_map_title)
         title.textSize = 20f
         title.setTypeface(null, Typeface.BOLD)
-        title.setTextColor(ContextCompat.getColor(this,
-            R.color.colorText
-        ))
+        title.setTextColor(
+            ContextCompat.getColor(
+                this,
+                R.color.colorText
+            )
+        )
         title.gravity = Gravity.CENTER
         title.setPadding(10, 40, 10, 24)
         val builder = AlertDialog.Builder(this)
