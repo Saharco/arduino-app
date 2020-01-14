@@ -92,8 +92,7 @@ class ScanListActivity : AppCompatActivity() {
         val filteredList = scansMap.filterKeys { it.startsWith(query, ignoreCase = true) }
             .values
             .flatten()
-
-        filteredList.sortedBy { it.timestamp } // observe that that Date implements Comparable!
+            .sortedBy { it.timestamp }
 
         searchAdapter = object : RecyclerView.Adapter<ScanCardViewHolder>() {
             override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ScanCardViewHolder {
