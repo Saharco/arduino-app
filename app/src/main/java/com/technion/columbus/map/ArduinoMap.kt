@@ -5,12 +5,11 @@ import com.badlogic.gdx.maps.tiled.TiledMap
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer
 import com.badlogic.gdx.maps.tiled.TmxMapLoader
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer
-import com.technion.columbus.pojos.MapMatrix
 import com.technion.columbus.pojos.MapUpload
 
-class ArduinoMap : GameMap {
+class ArduinoMap(mapFile: String = "20x20_meter_empty_map.tmx") : GameMap {
 
-    private val tiledMap: TiledMap = TmxMapLoader().load("map_example2.tmx")
+    private val tiledMap: TiledMap = TmxMapLoader().load(mapFile)
     private val tiledMapRenderer: OrthogonalTiledMapRenderer = OrthogonalTiledMapRenderer(tiledMap)
     override val width = (tiledMap.layers[0] as TiledMapTileLayer).width
     override val height = (tiledMap.layers[0] as TiledMapTileLayer).height

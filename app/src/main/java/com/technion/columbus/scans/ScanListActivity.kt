@@ -1,6 +1,7 @@
 package com.technion.columbus.scans
 
 import android.annotation.SuppressLint
+import android.app.ProgressDialog
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
@@ -32,6 +33,8 @@ class ScanListActivity : AppCompatActivity() {
     private lateinit var allScansAdapter: FirestoreRecyclerAdapter<Scan, ScanCardViewHolder>
     private lateinit var searchAdapter: RecyclerView.Adapter<ScanCardViewHolder>
     private val scansMap = HashMap<String, ArrayList<Scan>>()
+
+    var loadingGameProgressDialog: ProgressDialog? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -108,7 +111,7 @@ class ScanListActivity : AppCompatActivity() {
             override fun onBindViewHolder(holder: ScanCardViewHolder, position: Int) {
                 val scan = filteredList[holder.adapterPosition]
                 Log.d(TAG, "Binding chat with the following data: $scan")
-                holder.bind(scan)
+                holder.bind(scan, this@ScanListActivity)
             }
         }
 
@@ -125,6 +128,7 @@ class ScanListActivity : AppCompatActivity() {
         super.onStop()
         searchView.closeSearch()
         allScansAdapter.stopListening()
+        loadingGameProgressDialog?.dismiss()
     }
 
     private fun showAllScans() {
@@ -158,7 +162,7 @@ class ScanListActivity : AppCompatActivity() {
                 position: Int,
                 scan: Scan
             ) {
-                holder.bind(scan)
+                holder.bind(scan, this@ScanListActivity)
                 if (scansMap[scan.scanName] == null)
                     scansMap[scan.scanName] = ArrayList()
                 if (!scansMap[scan.scanName]!!.contains(scan))

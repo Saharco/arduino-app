@@ -1,5 +1,6 @@
 package com.technion.columbus.scans
 
+import android.app.ProgressDialog
 import android.content.Intent
 import android.view.View
 import android.widget.ImageView
@@ -38,8 +39,10 @@ class ScanCardViewHolder(v: View) : RecyclerView.ViewHolder(v) {
         robotTile.setImageResource(stringToTileResource(scan.robotTileName))
     }
 
-    private fun setNavigationToInfoActivity(scan: Scan) {
+    private fun setNavigationToInfoActivity(scan: Scan, scanListActivity: ScanListActivity?) {
         card.setOnClickListener { button ->
+            if (scanListActivity != null)
+                showLoadingDialog(scanListActivity)
             FirebaseFirestore.getInstance()
                 .collection("mapGrids")
                 .document(scan.mapGridId!!)
@@ -54,8 +57,18 @@ class ScanCardViewHolder(v: View) : RecyclerView.ViewHolder(v) {
         }
     }
 
-    fun bind(scan: Scan) {
+    private fun showLoadingDialog(scanListActivity: ScanListActivity) {
+        scanListActivity.loadingGameProgressDialog = ProgressDialog.show(
+            scanListActivity,
+            scanListActivity.getString(R.string.loading_stored_scan_game_title),
+            scanListActivity.getString(R.string.loading_stored_scan_game_message)
+        )
+
+        scanListActivity.loadingGameProgressDialog!!.isIndeterminate = true
+    }
+
+    fun bind(scan: Scan, scanListActivity: ScanListActivity? = null) {
         populateUI(scan)
-        setNavigationToInfoActivity(scan)
+        setNavigationToInfoActivity(scan, scanListActivity)
     }
 }

@@ -21,12 +21,14 @@
     <string name="scan_radius_title">Scan Radius: (in meters)</string>
     <string name="scan_error_no_name">Please choose a name for this scan</string>
     <string name="scan_error_no_map_scan_mode">Please specify both the control mode and map style for this scan</string>
+    <string name="loading_scan_game_title">Loading</string>
+    <string name="loading_scan_game_message">Loading your new game map.\nHold on just a moment!</string>
 
     <!--  Map Activity strings  -->
     <string name="end_scan_button">Finish Scan</string>
     <string name="dismiss_map_title">Cancel Scan</string>
-    <string name="dismiss_map_message">Your map will not be saved.\nAre you sure you want to dismiss this scan?</string>
-    <string name="scan_upload_title">Upload</string>
+    <string name="dismiss_map_message">Are you sure you want to dismiss this scan?\nYour map will not be saved</string>
+    <string name="scan_upload_title">Uploading</string>
     <string name="loading_scan_upload_message">Your scan is being uploaded.\nThis process might take a while</string>
     <string name="upload_success_dialog_title">Scan uploaded successfully!</string>
     <string name="upload_success_dialog_message">You can view this scan in "Previous Scans"</string>
@@ -36,4 +38,6 @@
     <string name="previous_scans_title">Previous Scans</string>
     <string name="search_option_title">Search</string>
     <string name="empty_feed_text">No scans available</string>
+    <string name="loading_stored_scan_game_title">Loading</string>
+    <string name="loading_stored_scan_game_message">Loading your previous game map.\nHold on just a moment!</string>
 </resources>

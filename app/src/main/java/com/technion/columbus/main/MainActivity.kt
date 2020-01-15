@@ -1,5 +1,6 @@
 package com.technion.columbus.main
 
+import android.app.ProgressDialog
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -44,6 +45,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var floorSlotPicker: TileSlotPicker
     private lateinit var wallSlotPicker: TileSlotPicker
     private lateinit var robotSlotPicker: TileSlotPicker
+
+    private var loadingGameProgressDialog: ProgressDialog? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -144,8 +147,17 @@ class MainActivity : AppCompatActivity() {
                 CHOSEN_ROBOT_TILE,
                 tileResourceToString(robotSlotPicker.tileId)
             )
-            startActivity(startGameIntent)
             dialog.dismiss()
+
+            loadingGameProgressDialog = ProgressDialog.show(
+                this@MainActivity,
+                getString(R.string.loading_scan_game_title),
+                getString(R.string.loading_scan_game_message)
+            )
+
+            loadingGameProgressDialog!!.isIndeterminate = true
+
+            startActivity(startGameIntent)
         }
 
         dialog.negativeButton {
@@ -184,6 +196,11 @@ class MainActivity : AppCompatActivity() {
                 automaticModeOptions.visibility = View.GONE
             }
         }
+    }
+
+    override fun onStop() {
+        super.onStop()
+        loadingGameProgressDialog?.dismiss()
     }
 
     /**

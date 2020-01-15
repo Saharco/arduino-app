@@ -16,6 +16,7 @@ import com.badlogic.gdx.backends.android.AndroidApplication
 import com.google.firebase.firestore.FirebaseFirestore
 import com.technion.columbus.R
 import com.technion.columbus.main.MainActivity
+import com.technion.columbus.pojos.MapMatrix
 import com.technion.columbus.pojos.MapScanMode
 import com.technion.columbus.pojos.Scan
 import com.technion.columbus.utility.*
@@ -159,5 +160,12 @@ class GameMapActivity : AndroidApplication() {
             .show()
         builder.create()
         return
+    }
+
+    /**
+     * This is a *temporary* method for creating a dummy mapping
+     */
+    fun createDummyScan(): MapMatrix {
+        TODO()
     }
 }
