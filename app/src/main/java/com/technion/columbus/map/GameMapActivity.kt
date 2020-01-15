@@ -67,9 +67,9 @@ class GameMapActivity : AndroidApplication() {
 
             progressDialog.isIndeterminate = true
 
-            val map = game.map.asMapUpload()
+            val map = mapMatrix.toMapUpload()
             db.collection("mapGrids")
-                .add(map) // check if this is fine
+                .add(map)
                 .addOnSuccessListener {
                     val scan = Scan(
                         scanName!!,
@@ -83,7 +83,7 @@ class GameMapActivity : AndroidApplication() {
                         chosenRobotTile!!
                     )
                     db.collection("scans")
-                        .add(scan) // check if this is fine
+                        .add(scan)
                         .addOnSuccessListener {
                             progressDialog.dismiss()
                             displayFinishedScanDialog()

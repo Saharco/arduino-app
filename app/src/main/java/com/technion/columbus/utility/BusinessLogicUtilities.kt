@@ -75,21 +75,21 @@ fun createRandomDummyScan(): MapMatrix {
 /**
  * Converts a [MapMatrix] to a [MapUpload]
  */
-fun mapMatrixToMapUpload(mapMatrix: MapMatrix): MapUpload {
-    val tilesList = ArrayList(mapMatrix.tiles.map {
+fun MapMatrix.toMapUpload(): MapUpload {
+    val tilesList = ArrayList(this.tiles.map {
         ArrayList(it.toList())
     })
 
-    return MapUpload(mapMatrix.rows, mapMatrix.cols, tilesList)
+    return MapUpload(this.rows, this.cols, tilesList)
 }
 
 /**
  * Converts a [MapUpload] to a [MapMatrix], where the robot is facing down and placed at (0,0)
  */
-fun mapUploadToMapMatrix(mapUpload: MapUpload): MapMatrix {
-    val tilesGrid = mapUpload.tiles.map {
+fun MapUpload.toMapMatrix(): MapMatrix {
+    val tilesGrid = this.tiles.map {
         it.toCharArray()
     }.toTypedArray()
 
-    return MapMatrix(mapUpload.rows, mapUpload.cols, tiles = tilesGrid)
+    return MapMatrix(this.rows, this.cols, tiles = tilesGrid)
 }

@@ -47,12 +47,6 @@ class ArduinoMap(mapFile: String = "20x20_meter_empty_map.tmx") : GameMap {
         return TileType[id]
     }
 
-    fun asMapUpload(): MapUpload {
-        //TODO: implement the parsing logic
-        val tiles = ArrayList<ArrayList<Char>>()
-        return MapUpload(height, width, tiles)
-    }
-
     fun setMapTiles(newTiles: Array<CharArray>, rowStart: Int = 0, colStart: Int = 0) {
         newTiles.forEachIndexed { row, charArray ->
             charArray.forEachIndexed { col, char ->
