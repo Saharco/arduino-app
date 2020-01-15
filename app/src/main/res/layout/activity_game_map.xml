@@ -27,6 +27,18 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <Button
+        android:id="@+id/temporaryRandomButton"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginStart="4dp"
+        android:tint="@color/colorPrimary"
+        android:background="@android:color/transparent"
+        android:drawableTop="@android:drawable/ic_dialog_alert"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <android.widget.Button
         android:id="@+id/finishScanButton"
         android:layout_width="wrap_content"

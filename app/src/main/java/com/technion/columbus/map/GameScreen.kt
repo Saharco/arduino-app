@@ -9,10 +9,14 @@ import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.*
 import com.badlogic.gdx.math.Vector3
 import com.technion.columbus.main.MainActivity.Companion.TAG
+import com.technion.columbus.pojos.MapMatrix
 
 class GameScreen(private val playerName: String) : ApplicationAdapter(), InputProcessor {
 
     companion object {
+        const val GAME_MAP_TILES_WIDTH = 400
+        const val GAME_MAP_TILES_HEIGHT = 400
+
         const val TILE_HEIGHT = 32
         const val TILE_WIDTH = 32
 
@@ -30,10 +34,12 @@ class GameScreen(private val playerName: String) : ApplicationAdapter(), InputPr
         com.badlogic.gdx.utils.Array<com.badlogic.gdx.utils.Array<TextureRegion>>(4)
 
     private var animations = com.badlogic.gdx.utils.Array<Animation<TextureRegion>>(4)
-    lateinit var downAnimation: Animation<TextureRegion>
-    lateinit var leftAnimation: Animation<TextureRegion>
-    lateinit var rightAnimation: Animation<TextureRegion>
-    lateinit var upAnimation: Animation<TextureRegion>
+    private lateinit var downAnimation: Animation<TextureRegion>
+    private lateinit var leftAnimation: Animation<TextureRegion>
+    private lateinit var rightAnimation: Animation<TextureRegion>
+    private lateinit var upAnimation: Animation<TextureRegion>
+
+    private lateinit var currentAnimation: Animation<TextureRegion>
 
     var elapsedTime = 0f
 
@@ -82,6 +88,8 @@ class GameScreen(private val playerName: String) : ApplicationAdapter(), InputPr
         leftAnimation = animations[1]
         rightAnimation = animations[2]
         upAnimation = animations[3]
+
+        currentAnimation = downAnimation
     }
 
     override fun render() {
@@ -103,7 +111,7 @@ class GameScreen(private val playerName: String) : ApplicationAdapter(), InputPr
         batch.projectionMatrix = camera.combined
         batch.begin()
         batch.draw(
-            rightAnimation.getKeyFrame(elapsedTime, true) as TextureRegion,
+            currentAnimation.getKeyFrame(elapsedTime, true) as TextureRegion,
             camera.position.x,
             camera.position.y,
             TILE_WIDTH / SCALE_FACTOR * 5,
@@ -131,6 +139,22 @@ class GameScreen(private val playerName: String) : ApplicationAdapter(), InputPr
     override fun dispose() {
         batch.dispose()
         map.dispose()
+    }
+
+    fun setNewMap(mapMatrix: MapMatrix) {
+        val scanXToMapX = GAME_MAP_TILES_WIDTH / 2 - mapMatrix.rows / 2
+        val scanYToMapY = GAME_MAP_TILES_HEIGHT / 2 - mapMatrix.cols / 2
+        map.setMapTiles(mapMatrix.tiles, scanXToMapX, scanYToMapY)
+
+        currentAnimation = when (mapMatrix.direction) {
+            'd' -> downAnimation
+            'l' -> leftAnimation
+            'r' -> rightAnimation
+            'u' -> upAnimation
+
+            else -> downAnimation
+        }
+        // TODO: handle robot's position
     }
 
     override fun touchUp(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {

@@ -44,6 +44,11 @@ class GameMapActivity : AndroidApplication() {
         fetchIntentData()
         displayGameWindow()
         setGameListeners()
+
+        //TODO: delete this when the real map data is being fetched correctly
+        temporaryRandomButton.setOnClickListener {
+            game.setNewMap(createRandomDummyScan())
+        }
     }
 
     private fun setGameListeners() {
@@ -165,7 +170,22 @@ class GameMapActivity : AndroidApplication() {
     /**
      * This is a *temporary* method for creating a dummy mapping
      */
-    fun createDummyScan(): MapMatrix {
-        TODO()
+    private fun createRandomDummyScan(): MapMatrix {
+
+        val rows = /*(50..400).random()*/ 400
+        val cols = (50..400).random()
+        val robotX = (50..rows).random()
+        val robotY = (50..rows).random()
+        val direction = listOf('d','l','r','u').random()
+
+        val tiles: Array<CharArray> = Array(rows) {
+            CharArray(cols) {
+                // floor tile is 12 times more likely than wall tile
+                if ((0..12).random() == 0) 1.toChar()
+                else 0.toChar()
+            }
+        }
+
+        return MapMatrix(rows, cols, robotX, robotY, direction, tiles)
     }
 }
