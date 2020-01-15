@@ -6,11 +6,9 @@ import com.badlogic.gdx.backends.android.AndroidApplication
 import com.technion.columbus.R
 import com.technion.columbus.map.GameScreen
 import com.technion.columbus.pojos.MapMatrix
-import com.technion.columbus.pojos.MapUpload
 import com.technion.columbus.pojos.Scan
 import com.technion.columbus.utility.MAP_UPLOAD
 import com.technion.columbus.utility.SCAN
-import com.technion.columbus.utility.toMapMatrix
 import kotlinx.android.synthetic.main.activity_scan_info.*
 
 class ScanInfoActivity : AndroidApplication() {
@@ -24,7 +22,7 @@ class ScanInfoActivity : AndroidApplication() {
         setContentView(R.layout.activity_scan_info)
 
         scan = intent.getSerializableExtra(SCAN) as Scan
-        mapMatrix = (intent.getSerializableExtra(MAP_UPLOAD) as MapUpload).toMapMatrix()
+        mapMatrix = intent.getSerializableExtra(MAP_UPLOAD) as MapMatrix
 
         displayGameWindow()
 
@@ -45,11 +43,8 @@ class ScanInfoActivity : AndroidApplication() {
     }
 
     private fun displayGameWindow() {
-        game = GameScreen(scan.robotTileName)
+        game = GameScreen(scan.robotTileName, mapMatrix)
         val gameView = initializeForView(game)
         gameMapView.addView(gameView)
-
-        // define the fetched map to be the displayed map
-        game.setNewMap(mapMatrix)
     }
 }

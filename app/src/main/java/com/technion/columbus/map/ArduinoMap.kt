@@ -9,7 +9,6 @@ import com.badlogic.gdx.maps.tiled.TiledMapTileLayer
 import com.badlogic.gdx.maps.tiled.TmxMapLoader
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer
 import com.badlogic.gdx.maps.tiled.tiles.StaticTiledMapTile
-import com.technion.columbus.pojos.MapUpload
 
 class ArduinoMap(mapFile: String = "20x20_meter_empty_map.tmx") : GameMap {
 

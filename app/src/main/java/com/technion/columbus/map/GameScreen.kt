@@ -11,7 +11,8 @@ import com.badlogic.gdx.math.Vector3
 import com.technion.columbus.main.MainActivity.Companion.TAG
 import com.technion.columbus.pojos.MapMatrix
 
-class GameScreen(private val playerName: String) : ApplicationAdapter(), InputProcessor {
+class GameScreen(private val playerName: String, private val mapMatrix: MapMatrix? = null) :
+    ApplicationAdapter(), InputProcessor {
 
     companion object {
         const val GAME_MAP_TILES_WIDTH = 400
@@ -24,7 +25,7 @@ class GameScreen(private val playerName: String) : ApplicationAdapter(), InputPr
         const val ANIMATION_FREQUENCY = 1 / 9f
     }
 
-    lateinit var map: ArduinoMap
+    private lateinit var map: ArduinoMap
 
     private lateinit var batch: SpriteBatch
     private lateinit var camera: OrthographicCamera
@@ -64,6 +65,9 @@ class GameScreen(private val playerName: String) : ApplicationAdapter(), InputPr
         map = ArduinoMap()
 
         configurePlayerAnimation()
+
+        if (mapMatrix != null)
+            setNewMap(mapMatrix)
     }
 
     private fun configurePlayerAnimation() {
