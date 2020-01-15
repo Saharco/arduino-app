@@ -29,6 +29,7 @@ class GameMapActivity : AndroidApplication() {
     private val db = FirebaseFirestore.getInstance()
 
     private lateinit var game: GameScreen
+    private var mapMatrix = MapMatrix()
 
     private var scanName: String? = null
     private var mapScanMode: MapScanMode? = null
@@ -47,7 +48,8 @@ class GameMapActivity : AndroidApplication() {
 
         //TODO: delete this when the real map data is being fetched correctly
         temporaryRandomButton.setOnClickListener {
-            game.setNewMap(createRandomDummyScan())
+            mapMatrix = createRandomDummyScan()
+            game.setNewMap(mapMatrix)
         }
     }
 
@@ -165,27 +167,5 @@ class GameMapActivity : AndroidApplication() {
             .show()
         builder.create()
         return
-    }
-
-    /**
-     * This is a *temporary* method for creating a dummy mapping
-     */
-    private fun createRandomDummyScan(): MapMatrix {
-
-        val rows = /*(50..400).random()*/ 400
-        val cols = (50..400).random()
-        val robotX = (50..rows).random()
-        val robotY = (50..rows).random()
-        val direction = listOf('d','l','r','u').random()
-
-        val tiles: Array<CharArray> = Array(rows) {
-            CharArray(cols) {
-                // floor tile is 12 times more likely than wall tile
-                if ((0..12).random() == 0) 1.toChar()
-                else 0.toChar()
-            }
-        }
-
-        return MapMatrix(rows, cols, robotX, robotY, direction, tiles)
     }
 }

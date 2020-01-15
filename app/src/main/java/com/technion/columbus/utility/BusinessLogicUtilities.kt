@@ -1,7 +1,12 @@
 package com.technion.columbus.utility
 
 import com.technion.columbus.R
+import com.technion.columbus.pojos.MapMatrix
+import com.technion.columbus.pojos.MapUpload
 
+/**
+ * Converts a tile's string to that tile's drawable resource
+ */
 fun stringToTileResource(tileName: String): Int {
     return when (tileName) {
         PLAYER_DOG -> R.drawable.dog_front_idle
@@ -19,6 +24,9 @@ fun stringToTileResource(tileName: String): Int {
     }
 }
 
+/**
+ * Converts a tile's drawable resource to that tile's name
+ */
 fun tileResourceToString(tileResource: Int): String {
     return when (tileResource) {
         R.drawable.dog_spin_animation -> PLAYER_DOG
@@ -40,4 +48,48 @@ fun tileResourceToString(tileResource: Int): String {
 
         else -> FLOOR_BLACK
     }
+}
+
+/**
+ * This is a utility method for generating a random mapping
+ */
+fun createRandomDummyScan(): MapMatrix {
+
+    val rows = 400
+    val cols = 400
+    val robotX = (50..rows).random()
+    val robotY = (50..rows).random()
+    val direction = listOf('d','l','r','u').random()
+
+    val tiles: Array<CharArray> = Array(rows) {
+        CharArray(cols) {
+            // floor tile is 12 times more likely than wall tile
+            if ((0..12).random() == 0) 1.toChar()
+            else 0.toChar()
+        }
+    }
+
+    return MapMatrix(rows, cols, robotX, robotY, direction, tiles)
+}
+
+/**
+ * Converts a [MapMatrix] to a [MapUpload]
+ */
+fun mapMatrixToMapUpload(mapMatrix: MapMatrix): MapUpload {
+    val tilesList = ArrayList(mapMatrix.tiles.map {
+        ArrayList(it.toList())
+    })
+
+    return MapUpload(mapMatrix.rows, mapMatrix.cols, tilesList)
+}
+
+/**
+ * Converts a [MapUpload] to a [MapMatrix], where the robot is facing down and placed at (0,0)
+ */
+fun mapUploadToMapMatrix(mapUpload: MapUpload): MapMatrix {
+    val tilesGrid = mapUpload.tiles.map {
+        it.toCharArray()
+    }.toTypedArray()
+
+    return MapMatrix(mapUpload.rows, mapUpload.cols, tiles = tilesGrid)
 }
