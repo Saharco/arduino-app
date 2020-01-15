@@ -16,7 +16,6 @@ import com.badlogic.gdx.backends.android.AndroidApplication
 import com.google.firebase.firestore.FirebaseFirestore
 import com.technion.columbus.R
 import com.technion.columbus.main.MainActivity
-import com.technion.columbus.pojos.MapMatrix
 import com.technion.columbus.pojos.MapScanMode
 import com.technion.columbus.pojos.Scan
 import com.technion.columbus.utility.*
@@ -28,7 +27,7 @@ class GameMapActivity : AndroidApplication() {
 
     private val db = FirebaseFirestore.getInstance()
 
-    private val game = MapScreen()
+    private lateinit var game: GameScreen
 
     private var scanName: String? = null
     private var mapScanMode: MapScanMode? = null
@@ -100,6 +99,7 @@ class GameMapActivity : AndroidApplication() {
     }
 
     private fun displayGameWindow() {
+        game = GameScreen(playerName = chosenRobotTile!!)
         val gameView = initializeForView(game)
         gameMapView.addView(gameView)
     }

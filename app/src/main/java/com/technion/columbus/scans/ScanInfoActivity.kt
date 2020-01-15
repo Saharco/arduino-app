@@ -4,7 +4,7 @@ import android.os.Bundle
 import android.view.MenuItem
 import com.badlogic.gdx.backends.android.AndroidApplication
 import com.technion.columbus.R
-import com.technion.columbus.map.MapScreen
+import com.technion.columbus.map.GameScreen
 import com.technion.columbus.pojos.MapUpload
 import com.technion.columbus.pojos.Scan
 import com.technion.columbus.utility.MAP_UPLOAD
@@ -13,14 +13,16 @@ import kotlinx.android.synthetic.main.activity_scan_info.*
 
 class ScanInfoActivity : AndroidApplication() {
 
-    private val game = MapScreen()
+    private lateinit var game: GameScreen
+    private lateinit var scan: Scan
+    private lateinit var mapUpload: MapUpload
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_scan_info)
 
-        val scan = intent.getSerializableExtra(SCAN) as Scan
-        val mapMatrix = intent.getSerializableExtra(MAP_UPLOAD) as MapUpload
+        scan = intent.getSerializableExtra(SCAN) as Scan
+        mapUpload = intent.getSerializableExtra(MAP_UPLOAD) as MapUpload
 
         displayGameWindow()
 
@@ -41,6 +43,7 @@ class ScanInfoActivity : AndroidApplication() {
     }
 
     private fun displayGameWindow() {
+        game = GameScreen(scan.robotTileName)
         val gameView = initializeForView(game)
         gameMapView.addView(gameView)
     }

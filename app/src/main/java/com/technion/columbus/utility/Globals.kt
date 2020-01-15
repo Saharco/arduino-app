@@ -10,11 +10,11 @@ const val CHOSEN_ROBOT_TILE = "chosen-robot-tile"
 const val SCAN = "scan"
 const val MAP_UPLOAD = "map-matrix"
 
-const val PLAYER_DOG = "player_dog"
-const val PLAYER_CAT = "player_cat"
-const val PLAYER_CHICKEN = "player_chicken"
-const val PLAYER_HORSE = "player_horse"
-const val PLAYER_SHEEP = "player_sheep"
+const val PLAYER_DOG = "dog_texture"
+const val PLAYER_CAT = "cat_texture"
+const val PLAYER_CHICKEN = "chicken_texture"
+const val PLAYER_HORSE = "horse_texture"
+const val PLAYER_SHEEP = "sheep_texture"
 
 const val WALL_WOOD_1 = "wall_wood_1"
 
