@@ -3,6 +3,11 @@ package com.technion.columbus.utility
 import com.technion.columbus.R
 import com.technion.columbus.pojos.MapMatrix
 import com.technion.columbus.pojos.MapUpload
+import java.io.ByteArrayInputStream
+import java.io.ByteArrayOutputStream
+import java.io.ObjectInputStream
+import java.io.ObjectOutputStream
+import java.io.Serializable
 
 /**
  * Converts a tile's string to that tile's drawable resource
@@ -59,7 +64,7 @@ fun createRandomDummyScan(): MapMatrix {
     val cols = 400
     val robotX = (50..rows).random()
     val robotY = (50..rows).random()
-    val direction = listOf('d','l','r','u').random()
+    val direction = listOf('d', 'l', 'r', 'u').random()
 
     val tiles: Array<CharArray> = Array(rows) {
         CharArray(cols) {
@@ -76,9 +81,12 @@ fun createRandomDummyScan(): MapMatrix {
  * Converts a [MapMatrix] to a [MapUpload]
  */
 fun MapMatrix.toMapUpload(): MapUpload {
-    val tilesList = ArrayList(this.tiles.map {
-        ArrayList(it.toList())
-    })
+    val tilesList = ArrayList<String>()
+    for (row in 0 until this.rows) {
+        for (col in 0 until this.cols) {
+            tilesList.add(this.tiles[row][col].toString())
+        }
+    }
 
     return MapUpload(this.rows, this.cols, tilesList)
 }
@@ -87,9 +95,44 @@ fun MapMatrix.toMapUpload(): MapUpload {
  * Converts a [MapUpload] to a [MapMatrix], where the robot is facing down and placed at (0,0)
  */
 fun MapUpload.toMapMatrix(): MapMatrix {
-    val tilesGrid = this.tiles.map {
-        it.toCharArray()
-    }.toTypedArray()
+    val tilesGrid = Array(this.rows) { row ->
+        CharArray(this.cols) { col ->
+            this.tiles[this.rows * row + col][0]
+        }
+    }
 
     return MapMatrix(this.rows, this.cols, tiles = tilesGrid)
+}
+
+/**
+ * Serialize given object of generic type [T] into [ByteArray]
+ * @param obj: object to serialize
+ * @see ObjectInputStream
+ * @return the serialization result
+ */
+fun <T: Serializable> serialize(obj: T): ByteArray {
+    val baos = ByteArrayOutputStream()
+    val out = ObjectOutputStream(baos)
+    out.writeObject(obj)
+    out.flush()
+
+    val result = baos.toByteArray()
+    baos.close()
+
+    return result
+}
+
+/**
+ * Deserialize given [ByteArray] into object of generic type [T]
+ * @param bytes: the bytes to deserialize
+ * @return deserialized object of type [T]
+ */
+@Suppress("UNCHECKED_CAST")
+fun <T: Serializable> deserialize(bytes: ByteArray): T {
+    val bais = ByteArrayInputStream(bytes)
+    val ois = ObjectInputStream(bais)
+
+    val result = ois.readObject() as T
+    ois.close()
+    return result
 }

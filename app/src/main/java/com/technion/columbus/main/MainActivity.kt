@@ -132,7 +132,7 @@ class MainActivity : AppCompatActivity() {
                 return@positiveButton
             }
 
-            val scanRadius = seekBarProgressToScanRadius(scanRadiusSeekBar.progress)
+            val scanRadius = seekBarProgressToScanRadius(scanRadiusSeekBar.progress).toFloat()
 
             val startGameIntent = Intent(this@MainActivity, GameMapActivity::class.java)
             startGameIntent.putExtra(SCAN_NAME, name.toString())

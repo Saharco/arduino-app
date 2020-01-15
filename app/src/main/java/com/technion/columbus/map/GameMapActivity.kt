@@ -14,6 +14,7 @@ import com.afollestad.materialdialogs.customview.customView
 import com.afollestad.materialdialogs.customview.getCustomView
 import com.badlogic.gdx.backends.android.AndroidApplication
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.storage.FirebaseStorage
 import com.technion.columbus.R
 import com.technion.columbus.main.MainActivity
 import com.technion.columbus.pojos.MapMatrix
@@ -67,15 +68,20 @@ class GameMapActivity : AndroidApplication() {
 
             progressDialog.isIndeterminate = true
 
-            val map = mapMatrix.toMapUpload()
-            db.collection("mapGrids")
-                .add(map)
+            val mapGridId = "${System.currentTimeMillis()}${UUID.randomUUID()}"
+
+            val storageRef = FirebaseStorage.getInstance()
+                .reference
+                .child("map_grids")
+                .child(mapGridId)
+            val bytes = mapMatrix.serialize()
+            storageRef.putBytes(bytes)
                 .addOnSuccessListener {
                     val scan = Scan(
                         scanName!!,
-                        it.id,
-                        map.rows,
-                        map.cols,
+                        mapGridId,
+                        mapMatrix.rows,
+                        mapMatrix.cols,
                         Date(System.currentTimeMillis()),
                         scanRadius!!,
                         chosenFloorTile!!,

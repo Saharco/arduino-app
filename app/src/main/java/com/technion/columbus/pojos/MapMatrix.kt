@@ -19,6 +19,13 @@ data class MapMatrix(
     val direction: Char = 'd',
     val tiles: Array<CharArray> = emptyArray()
 ) : Serializable {
+
+    companion object {
+        fun deserialize(bytes: ByteArray): MapMatrix {
+            return com.technion.columbus.utility.deserialize<MapMatrix>(bytes)
+        }
+    }
+
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
@@ -41,5 +48,9 @@ data class MapMatrix(
         result = 31 * result + robotY
         result = 31 * result + tiles.contentDeepHashCode()
         return result
+    }
+
+    fun serialize(): ByteArray {
+        return com.technion.columbus.utility.serialize(this)
     }
 }
