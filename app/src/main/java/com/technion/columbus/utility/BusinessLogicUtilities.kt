@@ -75,8 +75,8 @@ fun createRandomDummyScan(): MapMatrix {
 
     val rows = 400
     val cols = 400
-    val robotX = (50..rows).random()
-    val robotY = (50..rows).random()
+    val robotX = (50..rows/2).random()
+    val robotY = (50..rows/2).random()
     val direction = listOf('d', 'l', 'r', 'u').random()
 
     val tiles: Array<CharArray> = Array(rows) {

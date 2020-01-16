@@ -7,8 +7,6 @@ import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.*
-import com.badlogic.gdx.math.Vector3
-import com.technion.columbus.main.MainActivity.Companion.TAG
 import com.technion.columbus.pojos.MapMatrix
 
 class GameScreen(private val playerName: String, private val mapMatrix: MapMatrix? = null) :
@@ -46,6 +44,7 @@ class GameScreen(private val playerName: String, private val mapMatrix: MapMatri
 
     private var playerX: Float = (GAME_MAP_TILES_WIDTH * TILE_WIDTH).toFloat() / 2
     private var playerY: Float = (GAME_MAP_TILES_HEIGHT * TILE_HEIGHT).toFloat() / 2
+    private var followingPlayer = true
 
     private var screenWidth: Float? = null
     private var screenHeight: Float? = null
@@ -107,11 +106,18 @@ class GameScreen(private val playerName: String, private val mapMatrix: MapMatri
         Gdx.gl.glClearColor(0.125f, 0.125f, 0.125f, 0.05f)
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
 
-        reverseCameraGesture()
+        if (followingPlayer)
+            focusPlayer()
+        else
+            moveCamera()
 
         map.render(camera)
 
         renderPlayer()
+    }
+
+    private fun moveCamera() {
+        reverseCameraGesture()
     }
 
     private fun renderPlayer() {
@@ -164,7 +170,26 @@ class GameScreen(private val playerName: String, private val mapMatrix: MapMatri
 
             else -> downAnimation
         }
-        // TODO: handle robot's position
+
+        playerX = mapMatrix.robotX * TILE_WIDTH.toFloat()
+        playerY = mapMatrix.robotY * TILE_HEIGHT.toFloat()
+    }
+
+    fun followPlayer() {
+        followingPlayer = true
+        focusPlayer()
+    }
+
+    fun unfollowPlayer() {
+        followingPlayer = false
+    }
+
+    private fun focusPlayer() {
+        val position = camera.position
+        position.x = playerX
+        position.y = playerY
+        camera.position.set(position)
+        camera.update()
     }
 
     override fun touchUp(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
