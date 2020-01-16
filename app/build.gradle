@@ -83,8 +83,8 @@ dependencies {
     implementation 'com.afollestad.material-dialogs:core:3.1.1'
     implementation 'com.afollestad.material-dialogs:bottomsheets:3.1.1'
     implementation 'com.afollestad.material-dialogs:lifecycle:3.1.1'
+    implementation 'com.afollestad.material-dialogs:input:3.1.1'
     implementation 'it.emperor.animatedcheckbox:animatedcheckbox:1.0.3'
-    implementation 'com.miguelcatalan:materialsearchview:1.4.0'
 
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'

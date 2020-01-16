@@ -24,3 +24,5 @@ const val WALL_WOOD_1 = "wall_wood_1"
 
 const val FLOOR_BLACK = "floor_black"
 const val FLOOR_CHECKERED = "floor_checkered"
+
+const val DEFAULT_IP_ADDRESS = "192.168.1.20"

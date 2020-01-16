@@ -1,27 +1,34 @@
 package com.technion.columbus.main
 
 import android.app.ProgressDialog
+import android.content.Context
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.text.InputType
 import android.view.View
 import android.widget.EditText
 import android.widget.RadioButton
 import android.widget.SeekBar
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import com.afollestad.materialdialogs.MaterialDialog
+import com.afollestad.materialdialogs.WhichButton
+import com.afollestad.materialdialogs.actions.setActionButtonEnabled
 import com.afollestad.materialdialogs.customview.customView
 import com.afollestad.materialdialogs.customview.getCustomView
+import com.afollestad.materialdialogs.input.getInputField
+import com.afollestad.materialdialogs.input.input
 import com.robinhood.ticker.TickerUtils
 import com.robinhood.ticker.TickerView
-import com.technion.columbus.map.GameMapActivity
 import com.technion.columbus.R
-import com.technion.columbus.scans.ScanListActivity
+import com.technion.columbus.map.GameMapActivity
 import com.technion.columbus.pojos.MapScanMode
+import com.technion.columbus.scans.ScanListActivity
 import com.technion.columbus.utility.*
 import kotlinx.android.synthetic.main.activity_main.*
+
 
 class MainActivity : AppCompatActivity() {
 
@@ -48,6 +55,67 @@ class MainActivity : AppCompatActivity() {
         }
 
         configureTileSlotPickers()
+        configureSettingsButton()
+    }
+
+    private fun configureSettingsButton() {
+        settingsButton.setOnClickListener {
+            val prevIpAddress = getSharedPreferences(
+                getString(R.string.preference_file_key),
+                Context.MODE_PRIVATE
+            ).getString(
+                getString(R.string.preference_ip_address_key), DEFAULT_IP_ADDRESS
+            )
+
+            val inputType = InputType.TYPE_CLASS_NUMBER
+
+            val dialog = MaterialDialog(this@MainActivity).show {
+                title(res = R.string.settings_title)
+                input(
+                    inputType = inputType,
+                    prefill = prevIpAddress,
+                    maxLength = 15,
+                    waitForPositiveButton = false
+                ) { dialog, text ->
+                    val inputField = dialog.getInputField()
+                    val isValid = isValidIpAddress(text)
+
+                    inputField.error = if (isValid) null else getString(R.string.error_invalid_ip)
+                    dialog.setActionButtonEnabled(WhichButton.POSITIVE, isValid)
+                }
+                positiveButton(R.string.settings_positive_button)
+                negativeButton(R.string.settings_negative_button)
+            }
+
+            val inputField: EditText = dialog.getInputField()
+            inputField.setBackgroundColor(
+                ContextCompat.getColor(
+                    this@MainActivity,
+                    android.R.color.transparent
+                )
+            )
+        }
+    }
+
+    private fun isValidIpAddress(text: CharSequence): Boolean {
+        return try {
+            if (text.isEmpty()) {
+                return false
+            }
+            val parts = text.split(".")
+            if (parts.size != 4) {
+                return false
+            }
+            for (s in parts) {
+                val i = s.toInt()
+                if (i < 0 || i > 255) {
+                    return false
+                }
+            }
+            !text.endsWith(".")
+        } catch (nfe: NumberFormatException) {
+            false
+        }
     }
 
     private fun configureTileSlotPickers() {
