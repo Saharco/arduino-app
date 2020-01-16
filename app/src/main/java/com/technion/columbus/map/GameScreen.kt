@@ -44,6 +44,9 @@ class GameScreen(private val playerName: String, private val mapMatrix: MapMatri
 
     var elapsedTime = 0f
 
+    private var playerX: Float = (GAME_MAP_TILES_WIDTH * TILE_WIDTH).toFloat() / 2
+    private var playerY: Float = (GAME_MAP_TILES_HEIGHT * TILE_HEIGHT).toFloat() / 2
+
     private var screenWidth: Float? = null
     private var screenHeight: Float? = null
 
@@ -61,11 +64,7 @@ class GameScreen(private val playerName: String, private val mapMatrix: MapMatri
 
         camera = OrthographicCamera()
         camera.setToOrtho(false, cameraWidth!!, cameraHeight!!)
-        camera.position.set(
-            (GAME_MAP_TILES_WIDTH * TILE_WIDTH).toFloat() / 2,
-            (GAME_MAP_TILES_HEIGHT * TILE_HEIGHT).toFloat() / 2,
-            0f
-        )
+        camera.position.set(playerX, playerY, 0f)
         camera.update()
 
         configurePlayerAnimation()
@@ -120,8 +119,8 @@ class GameScreen(private val playerName: String, private val mapMatrix: MapMatri
         batch.begin()
         batch.draw(
             currentAnimation.getKeyFrame(elapsedTime, true) as TextureRegion,
-            camera.position.x,
-            camera.position.y,
+            playerX,
+            playerY,
             TILE_WIDTH / SCALE_FACTOR * 5,
             TILE_HEIGHT / SCALE_FACTOR * 5
         )
