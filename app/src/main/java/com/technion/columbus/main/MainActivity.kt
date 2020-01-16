@@ -29,19 +29,6 @@ class MainActivity : AppCompatActivity() {
         const val TAG = "Columbus"
     }
 
-    private val floors = listOf(
-        R.drawable.floor_tile,
-        R.drawable.checkered_floor_tile
-    )
-    private val walls = listOf(R.drawable.wall_tile)
-    private val robots = listOf(
-        R.drawable.dog_spin_animation,
-        R.drawable.cat_spin_animation,
-        R.drawable.chicken_spin_animation,
-        R.drawable.horse_spin_animation,
-        R.drawable.sheep_spin_animation
-    )
-
     private lateinit var floorSlotPicker: TileSlotPicker
     private lateinit var wallSlotPicker: TileSlotPicker
     private lateinit var robotSlotPicker: TileSlotPicker
@@ -59,6 +46,27 @@ class MainActivity : AppCompatActivity() {
         previousScansButton.setOnClickListener {
             startActivity(Intent(this, ScanListActivity::class.java))
         }
+
+        configureTileSlotPickers()
+    }
+
+    private fun configureTileSlotPickers() {
+        val floors = listOf(
+            R.drawable.floor_tile,
+            R.drawable.checkered_floor_tile
+        )
+        val walls = listOf(R.drawable.wall_tile)
+        val robots = listOf(
+            R.drawable.dog_spin_animation,
+            R.drawable.cat_spin_animation,
+            R.drawable.chicken_spin_animation,
+            R.drawable.horse_spin_animation,
+            R.drawable.sheep_spin_animation,
+            R.drawable.little_boy_spin_animation,
+            R.drawable.little_girl_spin_animation,
+            R.drawable.old_man_spin_animation,
+            R.drawable.old_lady_spin_animation
+        )
 
         floorSlotPicker = TileSlotPicker(
             floorTileBox,

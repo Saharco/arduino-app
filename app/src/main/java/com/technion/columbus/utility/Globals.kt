@@ -15,6 +15,10 @@ const val PLAYER_CAT = "cat_texture"
 const val PLAYER_CHICKEN = "chicken_texture"
 const val PLAYER_HORSE = "horse_texture"
 const val PLAYER_SHEEP = "sheep_texture"
+const val PLAYER_LITTLE_BOY = "little_boy_texture"
+const val PLAYER_LITTLE_GIRL = "little_girl_texture"
+const val PLAYER_OLD_MAN = "old_man_texture"
+const val PLAYER_OLD_LADY = "old_lady_texture"
 
 const val WALL_WOOD_1 = "wall_wood_1"
 

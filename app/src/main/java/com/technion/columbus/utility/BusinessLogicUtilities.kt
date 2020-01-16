@@ -19,6 +19,10 @@ fun stringToTileResource(tileName: String): Int {
         PLAYER_CHICKEN -> R.drawable.chicken_front_idle
         PLAYER_HORSE -> R.drawable.horse_front_idle
         PLAYER_SHEEP -> R.drawable.sheep_front_idle
+        PLAYER_LITTLE_BOY -> R.drawable.little_boy_front_idle
+        PLAYER_LITTLE_GIRL -> R.drawable.little_girl_front_idle
+        PLAYER_OLD_MAN -> R.drawable.old_man_front_idle
+        PLAYER_OLD_LADY -> R.drawable.old_lady_front_idle
 
         WALL_WOOD_1 -> R.drawable.wall_tile
 
@@ -39,12 +43,21 @@ fun tileResourceToString(tileResource: Int): String {
         R.drawable.chicken_spin_animation -> PLAYER_CHICKEN
         R.drawable.horse_spin_animation -> PLAYER_HORSE
         R.drawable.sheep_spin_animation -> PLAYER_SHEEP
+        R.drawable.little_boy_spin_animation -> PLAYER_LITTLE_BOY
+        R.drawable.little_girl_spin_animation -> PLAYER_LITTLE_GIRL
+        R.drawable.old_man_spin_animation -> PLAYER_OLD_MAN
+        R.drawable.old_lady_spin_animation -> PLAYER_OLD_LADY
 
         R.drawable.dog_front_idle -> PLAYER_DOG
         R.drawable.cat_front_idle -> PLAYER_CAT
         R.drawable.chicken_front_idle -> PLAYER_CHICKEN
         R.drawable.horse_front_idle -> PLAYER_HORSE
         R.drawable.sheep_front_idle -> PLAYER_SHEEP
+        R.drawable.little_boy_front_idle -> PLAYER_LITTLE_BOY
+        R.drawable.little_girl_front_idle -> PLAYER_LITTLE_GIRL
+        R.drawable.old_man_front_idle -> PLAYER_OLD_MAN
+        R.drawable.old_lady_front_idle -> PLAYER_OLD_LADY
+
 
         R.drawable.wall_tile -> WALL_WOOD_1
 
