@@ -21,7 +21,7 @@ class GameScreen(private val playerName: String, private val mapMatrix: MapMatri
         const val TILE_HEIGHT = 32
         const val TILE_WIDTH = 32
 
-        const val SCALE_FACTOR = 1.4f
+        const val SCALE_FACTOR = 1.25f
         const val ANIMATION_FREQUENCY = 1 / 9f
     }
 
@@ -57,12 +57,16 @@ class GameScreen(private val playerName: String, private val mapMatrix: MapMatri
         cameraWidth = screenWidth!! * SCALE_FACTOR
         cameraHeight = screenHeight!! * SCALE_FACTOR
 
+        map = ArduinoMap()
+
         camera = OrthographicCamera()
         camera.setToOrtho(false, cameraWidth!!, cameraHeight!!)
-        camera.position.set(cameraWidth!! / 2, cameraHeight!! / 2, 0f)
+        camera.position.set(
+            (GAME_MAP_TILES_WIDTH * TILE_WIDTH).toFloat() / 2,
+            (GAME_MAP_TILES_HEIGHT * TILE_HEIGHT).toFloat() / 2,
+            0f
+        )
         camera.update()
-
-        map = ArduinoMap()
 
         configurePlayerAnimation()
 
@@ -130,6 +134,7 @@ class GameScreen(private val playerName: String, private val mapMatrix: MapMatri
             camera.update()
         }
 
+        /*
         if (Gdx.input.justTouched()) {
             val tilePosition =
                 camera.unproject(Vector3(Gdx.input.x.toFloat(), Gdx.input.y.toFloat(), 0f))
@@ -138,6 +143,8 @@ class GameScreen(private val playerName: String, private val mapMatrix: MapMatri
                 Gdx.app.log(TAG, "clicked on tile: ${tileType.name}")
             }
         }
+
+         */
     }
 
     override fun dispose() {
