@@ -60,19 +60,13 @@ class MainActivity : AppCompatActivity() {
 
     private fun configureSettingsButton() {
         settingsButton.setOnClickListener {
-            val prevIpAddress = getSharedPreferences(
-                getString(R.string.preference_file_key),
-                Context.MODE_PRIVATE
-            ).getString(
+            val prevIpAddress = getPreferences(Context.MODE_PRIVATE).getString(
                 getString(R.string.preference_ip_address_key), DEFAULT_IP_ADDRESS
             )
-
-            val inputType = InputType.TYPE_CLASS_NUMBER
 
             val dialog = MaterialDialog(this@MainActivity).show {
                 title(res = R.string.settings_title)
                 input(
-                    inputType = inputType,
                     prefill = prevIpAddress,
                     maxLength = 15,
                     waitForPositiveButton = false
@@ -83,7 +77,22 @@ class MainActivity : AppCompatActivity() {
                     inputField.error = if (isValid) null else getString(R.string.error_invalid_ip)
                     dialog.setActionButtonEnabled(WhichButton.POSITIVE, isValid)
                 }
-                positiveButton(R.string.settings_positive_button)
+                positiveButton(R.string.settings_positive_button) { dialog ->
+                    val sharedPref = getPreferences(Context.MODE_PRIVATE) ?: return@positiveButton
+                    with(sharedPref.edit()) {
+                        putString(
+                            getString(R.string.preference_ip_address_key),
+                            dialog.getInputField().text.toString()
+                        )
+                        apply()
+
+                        Toast.makeText(
+                            this@MainActivity,
+                            R.string.toast_ip_updated,
+                            Toast.LENGTH_LONG
+                        ).show()
+                    }
+                }
                 negativeButton(R.string.settings_negative_button)
             }
 
