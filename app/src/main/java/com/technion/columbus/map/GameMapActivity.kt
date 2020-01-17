@@ -109,7 +109,11 @@ class GameMapActivity : AndroidApplication() {
     }
 
     private fun displayGameWindow() {
-        game = GameScreen(playerName = chosenRobotTile!!)
+        game = GameScreen(
+            playerName = chosenRobotTile!!,
+            floorTileName = chosenFloorTile!!,
+            wallTileName = chosenWallTile!!
+        )
         val gameView = initializeForView(game)
         gameMapView.addView(gameView)
     }

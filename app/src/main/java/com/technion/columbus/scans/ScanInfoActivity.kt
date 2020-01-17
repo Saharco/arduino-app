@@ -27,7 +27,7 @@ class ScanInfoActivity : AndroidApplication() {
         displayGameWindow()
 
         ScanCardViewHolder(scan_card)
-                .populateUI(scan)
+            .populateUI(scan)
 
         backButton.setOnClickListener {
             onBackPressed()
@@ -43,7 +43,12 @@ class ScanInfoActivity : AndroidApplication() {
     }
 
     private fun displayGameWindow() {
-        game = GameScreen(scan.robotTileName, mapMatrix)
+        game = GameScreen(
+            playerName = scan.robotTileName,
+            floorTileName = scan.floorTileName,
+            wallTileName = scan.wallTileName,
+            mapMatrix = mapMatrix
+        )
         val gameView = initializeForView(game)
         gameMapView.addView(gameView)
     }

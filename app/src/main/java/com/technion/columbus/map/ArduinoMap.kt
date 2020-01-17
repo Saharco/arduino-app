@@ -10,22 +10,30 @@ import com.badlogic.gdx.maps.tiled.TmxMapLoader
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer
 import com.badlogic.gdx.maps.tiled.tiles.StaticTiledMapTile
 
-class ArduinoMap(mapFile: String = "20x20_meter_empty_map.tmx") : GameMap {
-
-    companion object {
-        const val TILE_WIDTH = 32
-        const val TILE_HEIGHT = 32
-    }
+class ArduinoMap(
+    floorTileName: String,
+    wallTileName: String,
+    mapFile: String = "20x20_meter_empty_map.tmx"
+) : GameMap {
 
     private val tiledMap: TiledMap = TmxMapLoader().load(mapFile)
     private val tiledMapRenderer: OrthogonalTiledMapRenderer = OrthogonalTiledMapRenderer(tiledMap)
-    private val mapTiles = tiledMap.layers[0] as TiledMapTileLayer
-    private val tiles =
-        TextureRegion.split(Texture(Gdx.files.internal("interior.png")), TILE_WIDTH, TILE_HEIGHT)
+    private val floorTiles = tiledMap.layers[0] as TiledMapTileLayer
+    private val wallTiles = tiledMap.layers[1] as TiledMapTileLayer
 
     override val width = (tiledMap.layers[0] as TiledMapTileLayer).width
     override val height = (tiledMap.layers[0] as TiledMapTileLayer).height
     override val layers = tiledMap.layers.size()
+
+    private val floorTileCell = TiledMapTileLayer.Cell()
+    private val wallTileCell = TiledMapTileLayer.Cell()
+
+    init {
+        floorTileCell.tile =
+            StaticTiledMapTile(TextureRegion(Texture(Gdx.files.internal("floor_tiles/$floorTileName.png"))))
+        wallTileCell.tile =
+            StaticTiledMapTile(TextureRegion(Texture(Gdx.files.internal("wall_tiles/$wallTileName.png"))))
+    }
 
     override fun render(camera: OrthographicCamera) {
         tiledMapRenderer.setView(camera)
@@ -49,13 +57,10 @@ class ArduinoMap(mapFile: String = "20x20_meter_empty_map.tmx") : GameMap {
     fun setMapTiles(newTiles: Array<CharArray>, rowStart: Int = 0, colStart: Int = 0) {
         newTiles.forEachIndexed { row, charArray ->
             charArray.forEachIndexed { col, char ->
-                val (tileTexturePosX, tileTexturePosY) =
-                    if (char == '1') Pair(0, 0)
-                    else Pair(1, 3)
+                floorTiles.setCell(rowStart + row, colStart + col, floorTileCell)
 
-                val cell = TiledMapTileLayer.Cell()
-                cell.tile = StaticTiledMapTile(tiles[tileTexturePosX][tileTexturePosY])
-                mapTiles.setCell(rowStart + row, colStart + col, cell)
+                if (char == '1')
+                    wallTiles.setCell(rowStart + row, colStart + col, wallTileCell)
             }
         }
     }

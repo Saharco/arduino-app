@@ -8,8 +8,16 @@ import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.*
 import com.technion.columbus.pojos.MapMatrix
+import com.technion.columbus.utility.FLOOR_BLACK
+import com.technion.columbus.utility.PLAYER_DOG
+import com.technion.columbus.utility.WALL_WOOD_1
 
-class GameScreen(private val playerName: String, private val mapMatrix: MapMatrix? = null) :
+class GameScreen(
+    private val playerName: String = PLAYER_DOG,
+    private val floorTileName: String = FLOOR_BLACK,
+    private val wallTileName: String = WALL_WOOD_1,
+    private val mapMatrix: MapMatrix? = null
+) :
     ApplicationAdapter(), InputProcessor {
 
     companion object {
@@ -61,7 +69,7 @@ class GameScreen(private val playerName: String, private val mapMatrix: MapMatri
         cameraWidth = screenWidth!! * SCALE_FACTOR
         cameraHeight = screenHeight!! * SCALE_FACTOR
 
-        map = ArduinoMap()
+        map = ArduinoMap(floorTileName, wallTileName)
 
         camera = OrthographicCamera()
         camera.setToOrtho(false, cameraWidth!!, cameraHeight!!)
