@@ -21,6 +21,8 @@ class GameScreen(private val playerName: String, private val mapMatrix: MapMatri
 
         const val SCALE_FACTOR = 1.25f
         const val ANIMATION_FREQUENCY = 1 / 9f
+
+        const val TRANSITION_FACTOR = .1f
     }
 
     private lateinit var map: ArduinoMap
@@ -107,7 +109,7 @@ class GameScreen(private val playerName: String, private val mapMatrix: MapMatri
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
 
         if (followingPlayer)
-            focusPlayer()
+            transitionToPlayer()
         else
             moveCamera()
 
@@ -177,7 +179,7 @@ class GameScreen(private val playerName: String, private val mapMatrix: MapMatri
 
     fun followPlayer() {
         followingPlayer = true
-        focusPlayer()
+        transitionToPlayer()
     }
 
     fun unfollowPlayer() {
@@ -188,6 +190,14 @@ class GameScreen(private val playerName: String, private val mapMatrix: MapMatri
         val position = camera.position
         position.x = playerX
         position.y = playerY
+        camera.position.set(position)
+        camera.update()
+    }
+
+    private fun transitionToPlayer() {
+        val position = camera.position
+        position.x += (playerX - position.x) * TRANSITION_FACTOR
+        position.y += (playerY - position.y) * TRANSITION_FACTOR
         camera.position.set(position)
         camera.update()
     }
