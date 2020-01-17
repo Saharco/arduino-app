@@ -50,7 +50,7 @@ class ArduinoMap(mapFile: String = "20x20_meter_empty_map.tmx") : GameMap {
         newTiles.forEachIndexed { row, charArray ->
             charArray.forEachIndexed { col, char ->
                 val (tileTexturePosX, tileTexturePosY) =
-                    if (char == 1.toChar()) Pair(0, 0)
+                    if (char == '1') Pair(0, 0)
                     else Pair(1, 3)
 
                 val cell = TiledMapTileLayer.Cell()

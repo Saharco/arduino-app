@@ -33,6 +33,7 @@ import java.net.Socket
 import java.net.UnknownHostException
 import java.util.*
 import kotlin.concurrent.thread
+import kotlin.math.PI
 
 class GameMapActivity : AndroidApplication() {
 
@@ -40,7 +41,8 @@ class GameMapActivity : AndroidApplication() {
         const val TAG = "GameMapActivity"
 
         const val RPI_ADDRESS = "192.168.1.20"
-        const val RPI_PORT = 50007
+        const val RPI_SEND_PORT = 50009
+        const val RPI_RECV_PORT = 50011
     }
 
     private val db = FirebaseFirestore.getInstance()
@@ -54,6 +56,8 @@ class GameMapActivity : AndroidApplication() {
     private var chosenFloorTile: String? = null
     private var chosenWallTile: String? = null
     private var chosenRobotTile: String? = null
+
+    private lateinit var client: ClientThread
 
     private var isRobotFollowed = false
 
@@ -71,6 +75,12 @@ class GameMapActivity : AndroidApplication() {
             mapMatrix = createRandomDummyScan()
             game.setNewMap(mapMatrix)
         }
+    }
+
+    override fun onStop() {
+        if (::client.isInitialized)
+            client.closeConnections()
+        super.onStop()
     }
 
     private fun configureFocusButton() {
@@ -92,7 +102,7 @@ class GameMapActivity : AndroidApplication() {
     }
 
     private fun setButtons() {
-        thread { ClientThread( RPI_ADDRESS, RPI_PORT).configure() }
+        thread { client = ClientThread( RPI_ADDRESS, RPI_SEND_PORT, RPI_RECV_PORT) }
     }
 
     private fun displayGameWindow() {
@@ -158,14 +168,29 @@ class GameMapActivity : AndroidApplication() {
         return
     }
 
-    inner class ClientThread(address: String, port: Int) {
-        lateinit var socket: Socket
+    inner class ClientThread(private val address: String, private val sendPort: Int,
+                             private val recvPort: Int) {
+        private lateinit var sendSocket: Socket
+        private lateinit var recvSocket: Socket
+        private var scanIsOnline = false
+        private var isConnectedToSocket = false
 
         init {
+            connectToSocket(sendPort)
+            configureButtons()
+            connectToSocket(recvPort)
+            thread { listen() }
+        }
+
+        private fun connectToSocket(port: Int) {
             try {
                 val serverAddr = InetAddress.getByName(address)
-                socket = Socket(serverAddr, port)
-                Log.d(TAG, "Connected to the socket")
+                when (port) {
+                    sendPort -> sendSocket = Socket(serverAddr, port)
+                    recvPort -> recvSocket = Socket(serverAddr, port)
+                }
+                Log.d(TAG, "Connected to port $port")
+                isConnectedToSocket = true
             } catch(e: UnknownHostException) {
                 Log.d(TAG, "Caught UnknownHostException")
                 e.printStackTrace()
@@ -181,7 +206,7 @@ class GameMapActivity : AndroidApplication() {
         private fun sendAction(action: String) {
             Log.d(TAG, "Action: $action")
             try {
-                socket.getOutputStream().write(action.toByteArray())
+                sendSocket.getOutputStream().write(action.toByteArray())
             } catch (e: IOException) {
                 Log.d(TAG, "Caught an IOException while sending data")
             } catch (e: Exception) {
@@ -191,12 +216,12 @@ class GameMapActivity : AndroidApplication() {
 
         private fun setGameListeners() {
             disposeScanButton.setOnClickListener {
-                socket.close()
+                closeConnections()
                 onBackPressed()
             }
 
             finishScanButton.setOnClickListener {
-                socket.close()
+                closeConnections()
                 val progressDialog = ProgressDialog.show(
                     this@GameMapActivity,
                     getString(R.string.scan_upload_title),
@@ -205,15 +230,20 @@ class GameMapActivity : AndroidApplication() {
 
                 progressDialog.isIndeterminate = true
 
-                val map = MapMatrix(game.map.height, game.map.width, game.map.asMatrix())
-                db.collection("mapGrids")
-                    .add(map) // check if this is fine
+                val mapGridId = "${System.currentTimeMillis()}${UUID.randomUUID()}"
+
+                val storageRef = FirebaseStorage.getInstance()
+                    .reference
+                    .child("map_grids")
+                    .child(mapGridId)
+                val bytes = mapMatrix.serialize()
+                storageRef.putBytes(bytes)
                     .addOnSuccessListener {
                         val scan = Scan(
                             scanName!!,
-                            it.id,
-                            map.rows,
-                            map.cols,
+                            mapGridId,
+                            mapMatrix.rows,
+                            mapMatrix.cols,
                             Date(System.currentTimeMillis()),
                             scanRadius!!,
                             chosenFloorTile!!,
@@ -221,30 +251,16 @@ class GameMapActivity : AndroidApplication() {
                             chosenRobotTile!!
                         )
                         db.collection("scans")
-                            .add(scan) // check if this is fine
+                            .add(scan)
                             .addOnSuccessListener {
                                 progressDialog.dismiss()
                                 displayFinishedScanDialog()
                             }
                     }
             }
-
-            //        val listener = object : ApplicationListener {
-            //            override fun create() {}
-            //
-            //            override fun dispose() {}
-            //
-            //            override fun render() {}
-            //
-            //            override fun pause() {}
-            //
-            //            override fun resume() {}
-            //
-            //            override fun resize(width: Int, height: Int) {}
-            //        }
         }
 
-        fun configure() {
+        private fun configureButtons() {
             Log.d(TAG, "Started configuring buttons")
             moveUp.setOnTouchListener { _, event ->
                 when (event.action) {
@@ -279,5 +295,110 @@ class GameMapActivity : AndroidApplication() {
 
             Log.d(TAG, "Finished configuring buttons")
         }
+
+        private fun listen() {
+            var i = 0
+            scanIsOnline = true
+            Log.d(TAG, "Started listening")
+            while (scanIsOnline) {
+                i++
+                if (!isConnectedToSocket)
+                    connectToSocket(recvPort)
+                try {
+                    val scanner = Scanner(recvSocket.getInputStream())
+                    val input = scanner.nextLine()
+                    val mapMatrix = parseInput(input.toByteArray())
+
+                    this@GameMapActivity.mapMatrix = mapMatrix
+                    game.setNewMap(mapMatrix)
+
+                    Log.d(TAG,"Map No. $i")
+                    Log.d(TAG, "$mapMatrix")
+                } catch (e: Exception) {
+                    Log.d(TAG, "Caught some exception while listening")
+                    break
+                }
+                isConnectedToSocket = false
+                recvSocket.close()
+            }
+            Log.d(TAG, "Finished listening")
+        }
+
+        fun closeConnections() {
+            try {
+                if (!sendSocket.isClosed)
+                    sendSocket.close()
+                if (!recvSocket.isClosed)
+                    recvSocket.close()
+            } catch (e: Exception) {
+                Log.d(TAG, "Caught exception while closing connections")
+            }
+        }
+    }
+
+    private fun parseInput(input: ByteArray): MapMatrix {
+        val width = (input.copyOfRange(0, 10)).toString(Charsets.UTF_8).toInt()
+        val height = (input.copyOfRange(10, 20)).toString(Charsets.UTF_8).toInt()
+        val robotX = (input.copyOfRange(20, 40)).toString(Charsets.UTF_8).toDouble()
+        val robotY = (input.copyOfRange(40, 60)).toString(Charsets.UTF_8).toDouble()
+//        val direction = (input.copyOfRange(60, 80)).toString(Charsets.UTF_8).toDouble()
+//        Log.d(TAG, "direction: $direction")
+
+        val mapByteArray = input.copyOfRange(60, 60 + (width * height))
+        val mapArray = CharArray(mapByteArray.size)
+        for (i in mapArray.indices)
+            mapArray[i] = mapByteArray[i].toChar()
+
+        val detMapArray = convertToDeterministicArray(mapArray)
+        val matrix = convertToMatrix(detMapArray, width, height)
+
+//        val dirCode = getDirectionCode(direction)
+        return MapMatrix(height, width, robotX, robotY, 'd', matrix)  // TODO: Change direction to received one
+    }
+
+    private fun getDirectionCode(direction: Double): Char {
+        val dirMod = direction % 2* PI
+        if (dirMod <= 1/4* PI && dirMod > 7/4* PI)
+            return 'u'
+        if (dirMod <= 3/4* PI && dirMod > 1/4* PI)
+            return 'r'
+        if (dirMod <= 5/4* PI && dirMod > 3/4* PI)
+            return 'd'
+        else
+            return 'l'
+    }
+
+    private fun convertToDeterministicArray(array: CharArray): CharArray {
+        var obstaclesCounter = 0
+        var floorCounter = 0
+        var uncertainCounter = 0
+        val detArray = CharArray(array.size)
+        for (i in array.indices) {
+            if (array[i].toInt() > 80) {
+                detArray[i] = '1'
+                obstaclesCounter++
+            }
+            else if (array[i].toInt() == 0) {
+                detArray[i] = '?'
+                uncertainCounter++
+            }
+            else {
+                detArray[i] = '0'
+                floorCounter++
+            }
+        }
+        Log.d(TAG, "Obstacles: $obstaclesCounter, Floor tiles: $floorCounter, " +
+                "Uncertain tiles: $uncertainCounter")
+        return detArray
+    }
+
+    private fun convertToMatrix(array: CharArray, width: Int, height: Int): Array<CharArray> {
+        val matrix: ArrayList<CharArray> = arrayListOf()
+        for (i in 0 until height) {
+            matrix.add(array.copyOfRange((height - i - 1) * width, ((height - i) * width)))
+        }
+
+
+        return matrix.toArray(arrayOf<CharArray>())
     }
 }

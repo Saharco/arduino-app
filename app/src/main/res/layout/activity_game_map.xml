@@ -25,19 +25,21 @@
         android:background="@android:color/transparent"
         android:drawableTop="@drawable/ic_close_white_40dp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="@id/finishScanButton"
+        app:layout_constraintBottom_toBottomOf="@id/finishScanButton"/>
 
     <Button
         android:id="@+id/temporaryRandomButton"
         android:layout_width="60dp"
         android:layout_height="60dp"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="4dp"
         android:layout_marginStart="4dp"
         android:tint="@color/colorPrimary"
+        android:visibility="gone"
         android:background="@android:color/transparent"
         android:drawableTop="@android:drawable/ic_dialog_alert"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintStart_toEndOf="@id/disposeScanButton"
+        app:layout_constraintTop_toTopOf="@id/disposeScanButton" />
 
     <Button
         android:id="@+id/focusRobotButton"
@@ -53,18 +55,15 @@
 
     <android.widget.Button
         android:id="@+id/finishScanButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:background="@drawable/main_screen_button_shape"
-        android:text="@string/end_scan_button"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:background="@drawable/ic_finish_scan"
         android:textAllCaps="false"
         android:textColor="@android:color/white"
-        android:textSize="18sp"
-        app:layout_constraintTop_toTopOf="@id/disposeScanButton"
-        app:layout_constraintBottom_toBottomOf="@id/disposeScanButton"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@id/disposeScanButton"
-        app:layout_constraintHorizontal_bias="0.9"/>
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/controlLayout"
@@ -79,11 +78,10 @@
             android:id="@+id/moveUp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            android:src="@drawable/ic_move_up"
-            android:background="@drawable/md_transparent"/>
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:background="@drawable/ic_arrow_up" />
 
         <ImageButton
             android:id="@+id/moveLeft"
@@ -94,8 +92,7 @@
             app:layout_constraintEnd_toStartOf="@id/moveUp"
             android:layout_marginEnd="8dp"
             android:layout_marginTop="8dp"
-            android:src="@drawable/ic_move_left"
-            android:background="@drawable/md_transparent"/>
+            android:background="@drawable/ic_arrow_left" />
 
         <ImageButton
             android:id="@+id/moveRight"
@@ -105,8 +102,7 @@
             app:layout_constraintStart_toEndOf="@id/moveUp"
             app:layout_constraintEnd_toEndOf="parent"
             android:layout_marginStart="8dp"
-            android:src="@drawable/ic_move_right"
-            android:background="@drawable/md_transparent"/>
+            android:background="@drawable/ic_arrow_right" />
 
         <ImageButton
             android:id="@+id/moveDown"
@@ -116,8 +112,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             android:layout_marginTop="8dp"
-            android:src="@drawable/ic_move_down"
-            android:background="@drawable/md_transparent" />
+            android:background="@drawable/ic_arrow_down" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

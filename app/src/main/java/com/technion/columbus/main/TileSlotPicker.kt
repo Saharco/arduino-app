@@ -1,5 +1,6 @@
 package com.technion.columbus.main
 
+import android.annotation.TargetApi
 import android.graphics.drawable.AnimationDrawable
 import android.view.View
 import android.widget.ImageView
@@ -18,7 +19,7 @@ import kotlin.properties.Delegates
  * @param isAnimated: If true, will play [tilesList] drawables' animations
  */
 class TileSlotPicker(
-    slotPicker: View,
+    val slotPicker: View,
     slotPickerName: String,
     private val tilesList: List<Int>,
     private val isAnimated: Boolean = false
@@ -72,11 +73,13 @@ class TileSlotPicker(
     /**
      * Displays the tile with resource [tilesList] [[slotIndex]]
      */
+    @TargetApi(23)
     private fun setIndexTile() {
         tileId = tilesList[slotIndex]
-        tileBox.setBackgroundResource(tileId)
+        //tileBox.setBackgroundResource(tileId)
+        tileBox.foreground = slotPicker.context.getDrawable(tileId)
             if (isAnimated) {
-            val animation = tileBox.background as AnimationDrawable
+            val animation = tileBox.foreground as AnimationDrawable
             animation.start()
         }
     }

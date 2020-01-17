@@ -14,8 +14,8 @@ import java.io.Serializable
 data class MapMatrix(
     val rows: Int = 0,
     val cols: Int = 0,
-    val robotX: Int = 0,
-    val robotY: Int = 0,
+    val robotX: Double = 0.0,
+    val robotY: Double = 0.0,
     val direction: Char = 'd',
     val tiles: Array<CharArray> = emptyArray()
 ) : Serializable {
@@ -24,6 +24,15 @@ data class MapMatrix(
         fun deserialize(bytes: ByteArray): MapMatrix {
             return com.technion.columbus.utility.deserialize<MapMatrix>(bytes)
         }
+    }
+
+    fun serialize(): ByteArray {
+        return com.technion.columbus.utility.serialize(this)
+    }
+
+    override fun toString(): String {
+        return "MapMatrix(rows=$rows, cols=$cols, robotX=$robotX, robotY=$robotY, " +
+        "direction: $direction, map size: ${tiles.size}x${tiles[0].size})"
     }
 
     override fun equals(other: Any?): Boolean {
@@ -36,6 +45,7 @@ data class MapMatrix(
         if (cols != other.cols) return false
         if (robotX != other.robotX) return false
         if (robotY != other.robotY) return false
+        if (direction != other.direction) return false
         if (!tiles.contentDeepEquals(other.tiles)) return false
 
         return true
@@ -44,13 +54,10 @@ data class MapMatrix(
     override fun hashCode(): Int {
         var result = rows
         result = 31 * result + cols
-        result = 31 * result + robotX
-        result = 31 * result + robotY
+        result = 31 * result + robotX.hashCode()
+        result = 31 * result + robotY.hashCode()
+        result = 31 * result + direction.hashCode()
         result = 31 * result + tiles.contentDeepHashCode()
         return result
-    }
-
-    fun serialize(): ByteArray {
-        return com.technion.columbus.utility.serialize(this)
     }
 }
