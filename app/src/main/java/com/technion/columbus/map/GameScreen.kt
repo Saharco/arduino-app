@@ -44,7 +44,7 @@ class GameScreen(private val playerName: String, private val mapMatrix: MapMatri
 
     private var playerX: Float = (GAME_MAP_TILES_WIDTH * TILE_WIDTH).toFloat() / 2
     private var playerY: Float = (GAME_MAP_TILES_HEIGHT * TILE_HEIGHT).toFloat() / 2
-    private var followingPlayer = true
+    private var followingPlayer = false
 
     private var screenWidth: Float? = null
     private var screenHeight: Float? = null

@@ -5,6 +5,7 @@ import android.content.Intent
 import android.graphics.Typeface
 import android.os.Bundle
 import android.view.Gravity
+import android.widget.Button
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
@@ -39,6 +40,8 @@ class GameMapActivity : AndroidApplication() {
     private var chosenWallTile: String? = null
     private var chosenRobotTile: String? = null
 
+    private var isRobotFollowed = false
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_game_map)
@@ -46,11 +49,30 @@ class GameMapActivity : AndroidApplication() {
         fetchIntentData()
         displayGameWindow()
         setGameListeners()
+        configureFocusButton()
 
         //TODO: delete this when the real map data is being fetched correctly
         temporaryRandomButton.setOnClickListener {
             mapMatrix = createRandomDummyScan()
             game.setNewMap(mapMatrix)
+        }
+    }
+
+    private fun configureFocusButton() {
+        focusRobotButton.setOnClickListener {
+            isRobotFollowed = if (isRobotFollowed) {
+                game.followPlayer()
+                (it as Button).setCompoundDrawablesWithIntrinsicBounds(
+                    0, R.drawable.ic_unfocus, 0, 0
+                )
+                isRobotFollowed.not()
+            } else {
+                game.unfollowPlayer()
+                (it as Button).setCompoundDrawablesWithIntrinsicBounds(
+                    0, R.drawable.ic_focus, 0, 0
+                )
+                isRobotFollowed.not()
+            }
         }
     }
 
