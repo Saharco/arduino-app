@@ -76,7 +76,7 @@ class GameScreen(private val playerName: String, private val mapMatrix: MapMatri
 
     private fun configurePlayerAnimation() {
         batch = SpriteBatch()
-        texture = Texture("$playerName.png")
+        texture = Texture("player_textures/$playerName.png")
         val allFrames = TextureRegion.split(texture, TILE_WIDTH, TILE_HEIGHT)
 
         // --- temporary ---

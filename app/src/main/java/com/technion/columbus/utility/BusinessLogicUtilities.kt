@@ -24,10 +24,25 @@ fun stringToTileResource(tileName: String): Int {
         PLAYER_OLD_MAN -> R.drawable.old_man_front_idle
         PLAYER_OLD_LADY -> R.drawable.old_lady_front_idle
 
-        WALL_WOOD_1 -> R.drawable.wall_tile
+        WALL_BARREL -> R.drawable.tile_wall_barrel
+        WALL_BLUE_FLOWERS -> R.drawable.tile_wall_blue_flowers
+        WALL_BRICK -> R.drawable.tile_wall_brick
+        WALL_FLOWER_POT -> R.drawable.tile_wall_flower_pot
+        WALL_LARGE_BUSH -> R.drawable.tile_wall_large_bush
+        WALL_LAVA -> R.drawable.tile_wall_lava
+        WALL_ROCK -> R.drawable.tile_wall_rock
+        WALL_SMALL_BUSH -> R.drawable.tile_wall_small_bush
+        WALL_WOOD_1 -> R.drawable.tile_wall_wood_1
 
-        FLOOR_BLACK -> R.drawable.floor_tile
-        FLOOR_CHECKERED -> R.drawable.checkered_floor_tile
+        FLOOR_BLACK -> R.drawable.tile_floor_black
+        FLOOR_CHECKERED -> R.drawable.tile_floor_checkered
+        FLOOR_CHESS -> R.drawable.tile_floor_chess
+        FLOOR_DIRT -> R.drawable.tile_floor_dirt
+        FLOOR_GRASS -> R.drawable.tile_floor_grass
+        FLOOR_MOLTEN_ROCK -> R.drawable.tile_floor_molten_rock
+        FLOOR_STONE -> R.drawable.tile_floor_stone
+        FLOOR_WOODEN_PLANK -> R.drawable.tile_floor_wooden_plank
+        FLOOR_PALE_BLUE_ROUGH -> R.drawable.tile_floor_pale_blue_rough
 
         else -> R.drawable.floor_tile
     }
@@ -58,11 +73,25 @@ fun tileResourceToString(tileResource: Int): String {
         R.drawable.old_man_front_idle -> PLAYER_OLD_MAN
         R.drawable.old_lady_front_idle -> PLAYER_OLD_LADY
 
+        R.drawable.tile_wall_barrel -> WALL_BARREL
+        R.drawable.tile_wall_blue_flowers -> WALL_BLUE_FLOWERS
+        R.drawable.tile_wall_brick -> WALL_BRICK
+        R.drawable.tile_wall_flower_pot -> WALL_FLOWER_POT
+        R.drawable.tile_wall_large_bush -> WALL_LARGE_BUSH
+        R.drawable.tile_wall_lava -> WALL_LAVA
+        R.drawable.tile_wall_rock -> WALL_ROCK
+        R.drawable.tile_wall_small_bush -> WALL_SMALL_BUSH
+        R.drawable.tile_wall_wood_1 -> WALL_WOOD_1
 
-        R.drawable.wall_tile -> WALL_WOOD_1
-
-        R.drawable.floor_tile -> FLOOR_BLACK
-        R.drawable.checkered_floor_tile -> FLOOR_CHECKERED
+        R.drawable.tile_floor_black -> FLOOR_BLACK
+        R.drawable.tile_floor_checkered -> FLOOR_CHECKERED
+        R.drawable.tile_floor_chess -> FLOOR_CHESS
+        R.drawable.tile_floor_dirt -> FLOOR_DIRT
+        R.drawable.tile_floor_grass -> FLOOR_GRASS
+        R.drawable.tile_floor_molten_rock -> FLOOR_MOLTEN_ROCK
+        R.drawable.tile_floor_stone -> FLOOR_STONE
+        R.drawable.tile_floor_wooden_plank -> FLOOR_WOODEN_PLANK
+        R.drawable.tile_floor_pale_blue_rough -> FLOOR_PALE_BLUE_ROUGH
 
         else -> FLOOR_BLACK
     }
@@ -123,7 +152,7 @@ fun MapUpload.toMapMatrix(): MapMatrix {
  * @see ObjectInputStream
  * @return the serialization result
  */
-fun <T: Serializable> serialize(obj: T): ByteArray {
+fun <T : Serializable> serialize(obj: T): ByteArray {
     val baos = ByteArrayOutputStream()
     val out = ObjectOutputStream(baos)
     out.writeObject(obj)
@@ -141,7 +170,7 @@ fun <T: Serializable> serialize(obj: T): ByteArray {
  * @return deserialized object of type [T]
  */
 @Suppress("UNCHECKED_CAST")
-fun <T: Serializable> deserialize(bytes: ByteArray): T {
+fun <T : Serializable> deserialize(bytes: ByteArray): T {
     val bais = ByteArrayInputStream(bytes)
     val ois = ObjectInputStream(bais)
 

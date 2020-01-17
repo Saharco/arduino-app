@@ -129,10 +129,28 @@ class MainActivity : AppCompatActivity() {
 
     private fun configureTileSlotPickers() {
         val floors = listOf(
-            R.drawable.floor_tile,
-            R.drawable.checkered_floor_tile
+            R.drawable.tile_floor_black,
+            R.drawable.tile_floor_checkered,
+            R.drawable.tile_floor_chess,
+            R.drawable.tile_floor_dirt,
+            R.drawable.tile_floor_grass,
+            R.drawable.tile_floor_molten_rock,
+            R.drawable.tile_floor_stone,
+            R.drawable.tile_floor_wooden_plank,
+            R.drawable.tile_floor_pale_blue_rough
         )
-        val walls = listOf(R.drawable.wall_tile)
+
+        val walls = listOf(
+            R.drawable.tile_wall_wood_1,
+            R.drawable.tile_wall_flower_pot,
+            R.drawable.tile_wall_wood_1,
+            R.drawable.tile_wall_wood_1,
+            R.drawable.tile_wall_wood_1,
+            R.drawable.tile_wall_wood_1,
+            R.drawable.tile_wall_wood_1,
+            R.drawable.tile_wall_wood_1
+        )
+
         val robots = listOf(
             R.drawable.dog_spin_animation,
             R.drawable.cat_spin_animation,
