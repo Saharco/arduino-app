@@ -360,8 +360,14 @@ class GameMapActivity : AndroidApplication() {
     private fun parseInput(input: ByteArray): MapMatrix {
         val width = (input.copyOfRange(0, 10)).toString(Charsets.UTF_8).toInt()
         val height = (input.copyOfRange(10, 20)).toString(Charsets.UTF_8).toInt()
-        val robotX = (input.copyOfRange(20, 40)).toString(Charsets.UTF_8).toDouble()
-        val robotY = (input.copyOfRange(40, 60)).toString(Charsets.UTF_8).toDouble()
+        val robotX = (input.copyOfRange(
+            20,
+            40
+        )).toString(Charsets.UTF_8).toDouble() + GameScreen.GAME_MAP_TILES_WIDTH / 2
+        val robotY = (input.copyOfRange(
+            40,
+            60
+        )).toString(Charsets.UTF_8).toDouble() + GameScreen.GAME_MAP_TILES_HEIGHT / 2
 //        val direction = (input.copyOfRange(60, 80)).toString(Charsets.UTF_8).toDouble()
 //        Log.d(TAG, "direction: $direction")
 

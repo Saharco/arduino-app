@@ -143,12 +143,13 @@ class MainActivity : AppCompatActivity() {
         val walls = listOf(
             R.drawable.tile_wall_wood_1,
             R.drawable.tile_wall_flower_pot,
-            R.drawable.tile_wall_wood_1,
-            R.drawable.tile_wall_wood_1,
-            R.drawable.tile_wall_wood_1,
-            R.drawable.tile_wall_wood_1,
-            R.drawable.tile_wall_wood_1,
-            R.drawable.tile_wall_wood_1
+            R.drawable.tile_wall_barrel,
+            R.drawable.tile_wall_small_bush,
+            R.drawable.tile_wall_large_bush,
+            R.drawable.tile_wall_lava,
+            R.drawable.tile_wall_brick,
+            R.drawable.tile_wall_rock,
+            R.drawable.tile_wall_blue_flowers
         )
 
         val robots = listOf(
