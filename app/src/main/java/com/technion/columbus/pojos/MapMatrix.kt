@@ -14,9 +14,9 @@ import java.io.Serializable
 data class MapMatrix(
     val rows: Int = 0,
     val cols: Int = 0,
-    val robotX: Double = 0.0,
-    val robotY: Double = 0.0,
-    val direction: Char = 'd',
+    var robotX: Double = 0.0,
+    var robotY: Double = 0.0,
+    var direction: Char = 'd',
     val tiles: Array<CharArray> = emptyArray()
 ) : Serializable {
 

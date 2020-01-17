@@ -39,6 +39,8 @@
     <string name="upload_success_dialog_title">Scan uploaded successfully!</string>
     <string name="upload_success_dialog_message">You can view this scan in "Previous Scans"</string>
     <string name="upload_success_ok">Awesome!</string>
+    <string name="finish_scan_title">Finish Scan</string>
+    <string name="finish_scan_message">Are you satisfied with your scan?\nOnce uploaded, it cannot be changed</string>
 
     <!--    Scan List strings   -->
     <string name="previous_scans_title">Previous Scans</string>

@@ -75,15 +75,15 @@ fun createRandomDummyScan(): MapMatrix {
 
     val rows = 400
     val cols = 400
-    val robotX = (50..rows).random().toDouble()
+    val robotX = (50..cols).random().toDouble()
     val robotY = (50..rows).random().toDouble()
     val direction = listOf('d', 'l', 'r', 'u').random()
 
     val tiles: Array<CharArray> = Array(rows) {
         CharArray(cols) {
             // floor tile is 12 times more likely than wall tile
-            if ((0..12).random() == 0) 1.toChar()
-            else 0.toChar()
+            if ((0..12).random() == 0) '1'
+            else '0'
         }
     }
 

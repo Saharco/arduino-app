@@ -173,8 +173,8 @@ class GameScreen(private val playerName: String, private val mapMatrix: MapMatri
             else -> downAnimation
         }
 
-        playerX = mapMatrix.robotX * TILE_WIDTH.toFloat()
-        playerY = mapMatrix.robotY * TILE_HEIGHT.toFloat()
+        playerX = mapMatrix.robotX.toFloat() * TILE_WIDTH.toFloat()
+        playerY = mapMatrix.robotY.toFloat() * TILE_HEIGHT.toFloat()
     }
 
     fun followPlayer() {

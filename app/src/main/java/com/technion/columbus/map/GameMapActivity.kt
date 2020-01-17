@@ -1,6 +1,7 @@
 package com.technion.columbus.map
 
 import android.app.ProgressDialog
+import android.content.Context
 import android.content.Intent
 import android.graphics.Typeface
 import android.os.Bundle
@@ -9,7 +10,7 @@ import android.view.Gravity
 import android.widget.Button
 import android.view.MotionEvent
 import android.widget.TextView
-import android.widget.Toast
+import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import com.afollestad.materialdialogs.MaterialDialog
@@ -40,7 +41,6 @@ class GameMapActivity : AndroidApplication() {
     companion object {
         const val TAG = "GameMapActivity"
 
-        const val RPI_ADDRESS = "192.168.1.20"
         const val RPI_SEND_PORT = 50009
         const val RPI_RECV_PORT = 50011
     }
@@ -102,7 +102,10 @@ class GameMapActivity : AndroidApplication() {
     }
 
     private fun setButtons() {
-        thread { client = ClientThread( RPI_ADDRESS, RPI_SEND_PORT, RPI_RECV_PORT) }
+        val ipAddress = getPreferences(Context.MODE_PRIVATE).getString(
+            getString(R.string.preference_ip_address_key), DEFAULT_IP_ADDRESS
+        )!!
+        thread { client = ClientThread(ipAddress, RPI_SEND_PORT, RPI_RECV_PORT) }
     }
 
     private fun displayGameWindow() {
@@ -146,8 +149,17 @@ class GameMapActivity : AndroidApplication() {
     }
 
     override fun onBackPressed() {
+        displaySimpleDialog(R.string.dismiss_map_title, R.string.dismiss_map_message, {
+            super.onBackPressed()
+        }, {})
+    }
+
+    private fun displaySimpleDialog(
+        @StringRes titleRes: Int, @StringRes messageRes: Int, positiveAction: () -> Unit,
+        negativeAction: () -> Unit
+    ) {
         val title = TextView(this)
-        title.setText(R.string.dismiss_map_title)
+        title.setText(titleRes)
         title.textSize = 20f
         title.setTypeface(null, Typeface.BOLD)
         title.setTextColor(
@@ -160,22 +172,65 @@ class GameMapActivity : AndroidApplication() {
         title.setPadding(10, 40, 10, 24)
         val builder = AlertDialog.Builder(this)
         builder.setCustomTitle(title)
-            .setMessage(R.string.dismiss_map_message)
-            .setPositiveButton(android.R.string.yes) { _, _ -> super.onBackPressed() }
-            .setNegativeButton(android.R.string.no) { _, _ -> }
+            .setMessage(messageRes)
+            .setPositiveButton(android.R.string.yes) { _, _ -> positiveAction.invoke() }
+            .setNegativeButton(android.R.string.no) { _, _ -> negativeAction.invoke() }
             .show()
         builder.create()
-        return
     }
 
-    inner class ClientThread(private val address: String, private val sendPort: Int,
-                             private val recvPort: Int) {
+    private fun uploadScan() {
+        val progressDialog = ProgressDialog.show(
+            this@GameMapActivity,
+            getString(R.string.scan_upload_title),
+            getString(R.string.loading_scan_upload_message)
+        )
+
+        progressDialog.isIndeterminate = true
+
+        val mapGridId = "${System.currentTimeMillis()}${UUID.randomUUID()}"
+
+        val storageRef = FirebaseStorage.getInstance()
+            .reference
+            .child("map_grids")
+            .child(mapGridId)
+        mapMatrix.robotX = GameScreen.GAME_MAP_TILES_WIDTH.toDouble() / 2
+        mapMatrix.robotY = GameScreen.GAME_MAP_TILES_HEIGHT.toDouble() / 2
+        mapMatrix.direction = 'd'
+        val bytes = mapMatrix.serialize()
+        storageRef.putBytes(bytes)
+            .addOnSuccessListener {
+                val scan = Scan(
+                    scanName!!,
+                    mapGridId,
+                    mapMatrix.rows,
+                    mapMatrix.cols,
+                    Date(System.currentTimeMillis()),
+                    scanRadius!!,
+                    chosenFloorTile!!,
+                    chosenWallTile!!,
+                    chosenRobotTile!!
+                )
+                db.collection("scans")
+                    .add(scan)
+                    .addOnSuccessListener {
+                        progressDialog.dismiss()
+                        displayFinishedScanDialog()
+                    }
+            }
+    }
+
+    inner class ClientThread(
+        private val address: String, private val sendPort: Int,
+        private val recvPort: Int
+    ) {
         private lateinit var sendSocket: Socket
         private lateinit var recvSocket: Socket
         private var scanIsOnline = false
         private var isConnectedToSocket = false
 
         init {
+            setGameListeners()
             connectToSocket(sendPort)
             configureButtons()
             connectToSocket(recvPort)
@@ -191,7 +246,7 @@ class GameMapActivity : AndroidApplication() {
                 }
                 Log.d(TAG, "Connected to port $port")
                 isConnectedToSocket = true
-            } catch(e: UnknownHostException) {
+            } catch (e: UnknownHostException) {
                 Log.d(TAG, "Caught UnknownHostException")
                 e.printStackTrace()
             } catch (e: IOException) {
@@ -216,47 +271,15 @@ class GameMapActivity : AndroidApplication() {
 
         private fun setGameListeners() {
             disposeScanButton.setOnClickListener {
-                closeConnections()
                 onBackPressed()
             }
 
             finishScanButton.setOnClickListener {
-                closeConnections()
-                val progressDialog = ProgressDialog.show(
-                    this@GameMapActivity,
-                    getString(R.string.scan_upload_title),
-                    getString(R.string.loading_scan_upload_message)
-                )
-
-                progressDialog.isIndeterminate = true
-
-                val mapGridId = "${System.currentTimeMillis()}${UUID.randomUUID()}"
-
-                val storageRef = FirebaseStorage.getInstance()
-                    .reference
-                    .child("map_grids")
-                    .child(mapGridId)
-                val bytes = mapMatrix.serialize()
-                storageRef.putBytes(bytes)
-                    .addOnSuccessListener {
-                        val scan = Scan(
-                            scanName!!,
-                            mapGridId,
-                            mapMatrix.rows,
-                            mapMatrix.cols,
-                            Date(System.currentTimeMillis()),
-                            scanRadius!!,
-                            chosenFloorTile!!,
-                            chosenWallTile!!,
-                            chosenRobotTile!!
-                        )
-                        db.collection("scans")
-                            .add(scan)
-                            .addOnSuccessListener {
-                                progressDialog.dismiss()
-                                displayFinishedScanDialog()
-                            }
-                    }
+                displaySimpleDialog(
+                    R.string.finish_scan_title,
+                    R.string.finish_scan_message,
+                    ::uploadScan
+                ) {}
             }
         }
 
@@ -291,8 +314,6 @@ class GameMapActivity : AndroidApplication() {
                 true
             }
 
-            setGameListeners()
-
             Log.d(TAG, "Finished configuring buttons")
         }
 
@@ -312,7 +333,7 @@ class GameMapActivity : AndroidApplication() {
                     this@GameMapActivity.mapMatrix = mapMatrix
                     game.setNewMap(mapMatrix)
 
-                    Log.d(TAG,"Map No. $i")
+                    Log.d(TAG, "Map No. $i")
                     Log.d(TAG, "$mapMatrix")
                 } catch (e: Exception) {
                     Log.d(TAG, "Caught some exception while listening")
@@ -353,19 +374,26 @@ class GameMapActivity : AndroidApplication() {
         val matrix = convertToMatrix(detMapArray, width, height)
 
 //        val dirCode = getDirectionCode(direction)
-        return MapMatrix(height, width, robotX, robotY, 'd', matrix)  // TODO: Change direction to received one
+        return MapMatrix(
+            height,
+            width,
+            robotX,
+            robotY,
+            'd',
+            matrix
+        )  // TODO: Change direction to received one
     }
 
     private fun getDirectionCode(direction: Double): Char {
-        val dirMod = direction % 2* PI
-        if (dirMod <= 1/4* PI && dirMod > 7/4* PI)
+        val dirMod = direction % 2 * PI
+        if (dirMod <= 1 / 4 * PI && dirMod > 7 / 4 * PI)
             return 'u'
-        if (dirMod <= 3/4* PI && dirMod > 1/4* PI)
+        if (dirMod <= 3 / 4 * PI && dirMod > 1 / 4 * PI)
             return 'r'
-        if (dirMod <= 5/4* PI && dirMod > 3/4* PI)
-            return 'd'
+        return if (dirMod <= 5 / 4 * PI && dirMod > 3 / 4 * PI)
+            'd'
         else
-            return 'l'
+            'l'
     }
 
     private fun convertToDeterministicArray(array: CharArray): CharArray {
@@ -374,21 +402,25 @@ class GameMapActivity : AndroidApplication() {
         var uncertainCounter = 0
         val detArray = CharArray(array.size)
         for (i in array.indices) {
-            if (array[i].toInt() > 80) {
-                detArray[i] = '1'
-                obstaclesCounter++
-            }
-            else if (array[i].toInt() == 0) {
-                detArray[i] = '?'
-                uncertainCounter++
-            }
-            else {
-                detArray[i] = '0'
-                floorCounter++
+            when {
+                array[i].toInt() > 80 -> {
+                    detArray[i] = '1'
+                    obstaclesCounter++
+                }
+                array[i].toInt() == 0 -> {
+                    detArray[i] = '?'
+                    uncertainCounter++
+                }
+                else -> {
+                    detArray[i] = '0'
+                    floorCounter++
+                }
             }
         }
-        Log.d(TAG, "Obstacles: $obstaclesCounter, Floor tiles: $floorCounter, " +
-                "Uncertain tiles: $uncertainCounter")
+        Log.d(
+            TAG, "Obstacles: $obstaclesCounter, Floor tiles: $floorCounter, " +
+                    "Uncertain tiles: $uncertainCounter"
+        )
         return detArray
     }
 
