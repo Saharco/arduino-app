@@ -2,11 +2,11 @@ package com.technion.columbus.map
 
 import com.badlogic.gdx.ApplicationAdapter
 import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.InputProcessor
 import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.*
+import com.badlogic.gdx.input.GestureDetector
 import com.technion.columbus.pojos.MapMatrix
 import com.technion.columbus.utility.FLOOR_BLACK
 import com.technion.columbus.utility.PLAYER_DOG
@@ -18,7 +18,7 @@ class GameScreen(
     private val wallTileName: String = WALL_WOOD_1,
     private val mapMatrix: MapMatrix? = null
 ) :
-    ApplicationAdapter(), InputProcessor {
+    ApplicationAdapter() {
 
     companion object {
         const val GAME_MAP_TILES_WIDTH = 400
@@ -71,7 +71,7 @@ class GameScreen(
 
         map = ArduinoMap(floorTileName, wallTileName)
 
-        camera = OrthographicCamera()
+        camera = GameScreenCamera()
         camera.setToOrtho(false, cameraWidth!!, cameraHeight!!)
         camera.position.set(playerX, playerY, 0f)
         camera.update()
@@ -80,6 +80,8 @@ class GameScreen(
 
         if (mapMatrix != null)
             setNewMap(mapMatrix)
+
+        Gdx.input.inputProcessor = GestureDetector(GameScreenGestureListener(camera))
     }
 
     private fun configurePlayerAnimation() {
@@ -194,51 +196,11 @@ class GameScreen(
         followingPlayer = false
     }
 
-    private fun focusPlayer() {
-        val position = camera.position
-        position.x = playerX
-        position.y = playerY
-        camera.position.set(position)
-        camera.update()
-    }
-
     private fun transitionToPlayer() {
         val position = camera.position
         position.x += (playerX - position.x) * TRANSITION_FACTOR
         position.y += (playerY - position.y) * TRANSITION_FACTOR
         camera.position.set(position)
         camera.update()
-    }
-
-    override fun touchUp(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
-    override fun mouseMoved(screenX: Int, screenY: Int): Boolean {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
-    override fun keyTyped(character: Char): Boolean {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
-    override fun scrolled(amount: Int): Boolean {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
-    override fun keyUp(keycode: Int): Boolean {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
-    override fun touchDragged(screenX: Int, screenY: Int, pointer: Int): Boolean {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
-    override fun keyDown(keycode: Int): Boolean {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
-    override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 }
