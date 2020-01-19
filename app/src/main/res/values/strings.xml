@@ -14,6 +14,11 @@
     <string name="settings_negative_button">Dismiss</string>
     <string name="error_invalid_ip">Not a valid IP address</string>
     <string name="toast_ip_updated">Updated IP Address for Columbus</string>
+    <string name="scan_dialog_connected">Connected</string>
+    <string name="scan_dialog_disconnected">No Connection</string>
+
+    <string name="connection_error_retry">Retry</string>
+    <string name="connection_error_title">Connection Error</string>
 
     <!--  Scan Configuration strings  -->
     <string name="scan_configuration_title">Scan Configuration</string>

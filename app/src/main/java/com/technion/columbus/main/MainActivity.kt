@@ -4,12 +4,9 @@ import android.app.ProgressDialog
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.text.InputType
+import android.util.Log
 import android.view.View
-import android.widget.EditText
-import android.widget.RadioButton
-import android.widget.SeekBar
-import android.widget.Toast
+import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
@@ -24,10 +21,14 @@ import com.robinhood.ticker.TickerUtils
 import com.robinhood.ticker.TickerView
 import com.technion.columbus.R
 import com.technion.columbus.map.GameMapActivity
-import com.technion.columbus.pojos.MapScanMode
+import com.technion.columbus.map.SocketsHandler
+import com.technion.columbus.map.SocketsHolder.Companion.recvSocket
+import com.technion.columbus.map.SocketsHolder.Companion.sendSocket
 import com.technion.columbus.scans.ScanListActivity
 import com.technion.columbus.utility.*
 import kotlinx.android.synthetic.main.activity_main.*
+import java.net.Socket
+import kotlin.concurrent.thread
 
 
 class MainActivity : AppCompatActivity() {
@@ -41,6 +42,9 @@ class MainActivity : AppCompatActivity() {
     private lateinit var robotSlotPicker: TileSlotPicker
 
     private var loadingGameProgressDialog: ProgressDialog? = null
+
+    private var connectionStatus = false
+    private lateinit var validationThread: Thread
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -56,6 +60,14 @@ class MainActivity : AppCompatActivity() {
 
         configureTileSlotPickers()
         configureSettingsButton()
+    }
+
+    override fun onStart() {
+        super.onStart()
+        val ipAddress = getPreferences(Context.MODE_PRIVATE).getString(
+            getString(R.string.preference_ip_address_key), DEFAULT_IP_ADDRESS
+        )!!
+        connectSockets(ipAddress)
     }
 
     private fun configureSettingsButton() {
@@ -191,19 +203,26 @@ class MainActivity : AppCompatActivity() {
 
         val dialogView = dialog.getCustomView()
 
+        val connectionStatusImage = dialogView.findViewById<ImageView>(R.id.connectionStatusImage)
+        val connectionStatusText = dialogView.findViewById<TextView>(R.id.connectionStatusText)
+        connectionStatusImage.setImageResource(R.drawable.ic_disconnected)
+        connectionStatusText.setText(R.string.scan_dialog_disconnected)
+
         val scanName = dialogView.findViewById<EditText>(R.id.scanName)
 
         val controlModeAutomatic = dialogView.findViewById<RadioButton>(R.id.controlModeAutomatic)
         val controlModeManual = dialogView.findViewById<RadioButton>(R.id.controlModeManual)
 
-        val mapModeGame = dialogView.findViewById<RadioButton>(R.id.mapModeGame)
-        val mapModeBlueprint = dialogView.findViewById<RadioButton>(R.id.mapModeBlueprint)
+//        val mapModeGame = dialogView.findViewById<RadioButton>(R.id.mapModeGame)
+//        val mapModeBlueprint = dialogView.findViewById<RadioButton>(R.id.mapModeBlueprint)
 
         val automaticModeOptions =
             dialogView.findViewById<ConstraintLayout>(R.id.automaticModeOptions)
 
         val scanRadiusPicker = dialogView.findViewById<TickerView>(R.id.scanRadiusPicker)
         val scanRadiusSeekBar = dialogView.findViewById<SeekBar>(R.id.scanRadiusSeekBar)
+
+        validationThread = thread { updateConnectionStatusUI(connectionStatusImage, connectionStatusText) }
 
         dialog.positiveButton {
             val name = scanName.text.trim()
@@ -216,23 +235,29 @@ class MainActivity : AppCompatActivity() {
                 return@positiveButton
             }
 
-            var mapScanMode = MapScanMode.MODE_ILLEGAL
-            if (controlModeAutomatic.isChecked && mapModeGame.isChecked) {
-                mapScanMode = MapScanMode.MODE_AUTOMATIC_GAME
-            } else if (controlModeAutomatic.isChecked && mapModeBlueprint.isChecked) {
-                mapScanMode = MapScanMode.MODE_AUTOMATIC_BLUEPRINT
-            } else if (controlModeManual.isChecked && mapModeGame.isChecked) {
-                mapScanMode = MapScanMode.MODE_MANUAL_GAME
-            } else if (controlModeManual.isChecked && mapModeGame.isChecked) {
-                mapScanMode = MapScanMode.MODE_MANUAL_BLUEPRINT
-            }
+//            var mapScanMode = MapScanMode.MODE_ILLEGAL
+//            if (controlModeAutomatic.isChecked && mapModeGame.isChecked) {
+//                mapScanMode = MapScanMode.MODE_AUTOMATIC_GAME
+//            } else if (controlModeAutomatic.isChecked && mapModeBlueprint.isChecked) {
+//                mapScanMode = MapScanMode.MODE_AUTOMATIC_BLUEPRINT
+//            } else if (controlModeManual.isChecked && mapModeGame.isChecked) {
+//                mapScanMode = MapScanMode.MODE_MANUAL_GAME
+//            } else if (controlModeManual.isChecked && mapModeGame.isChecked) {
+//                mapScanMode = MapScanMode.MODE_MANUAL_BLUEPRINT
+//            }
+//
+//            if (mapScanMode == MapScanMode.MODE_ILLEGAL) {
+//                Toast.makeText(
+//                    this@MainActivity,
+//                    getString(R.string.scan_error_no_map_scan_mode),
+//                    Toast.LENGTH_LONG
+//                ).show()
+//                return@positiveButton
+//            }
 
-            if (mapScanMode == MapScanMode.MODE_ILLEGAL) {
-                Toast.makeText(
-                    this@MainActivity,
-                    getString(R.string.scan_error_no_map_scan_mode),
-                    Toast.LENGTH_LONG
-                ).show()
+            if (!connectionStatus) {
+                Toast.makeText(this@MainActivity.applicationContext, "No connection with Columbus",
+                    Toast.LENGTH_LONG).show()
                 return@positiveButton
             }
 
@@ -240,7 +265,7 @@ class MainActivity : AppCompatActivity() {
 
             val startGameIntent = Intent(this@MainActivity, GameMapActivity::class.java)
             startGameIntent.putExtra(SCAN_NAME, name.toString())
-            startGameIntent.putExtra(MAP_SCAN_MODE, mapScanMode)
+//            startGameIntent.putExtra(MAP_SCAN_MODE, mapScanMode)
             startGameIntent.putExtra(SCAN_RADIUS, scanRadius)
             startGameIntent.putExtra(
                 CHOSEN_FLOOR_TILE,
@@ -302,8 +327,71 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private fun connectSockets(ipAddress: String) {
+        thread {
+            val initSockets =
+                SocketsHandler(ipAddress, RPI_SEND_PORT, RPI_RECV_PORT)
+            thread {
+                while (!sendSocket.isConnected) {
+                    sendSocket = initSockets.getSendSocket()
+                }
+            }
+            thread {
+                while (!recvSocket.isConnected) {
+                    recvSocket = initSockets.getRecvSocket()
+                }
+            }
+        }
+    }
+
+    private fun updateConnectionStatusUI(connectionStatusImage: ImageView, connectionStatusText: TextView) {
+        fun updateDisconnectedUI() {
+            while (connectionStatus) {
+                updateConnectionStatus()
+            }
+            Log.d(TAG, "Disconnected. Updating connection indicators")
+            runOnUiThread {
+                connectionStatusImage.setImageResource(R.drawable.ic_disconnected)
+                connectionStatusText.setText(R.string.scan_dialog_disconnected)
+            }
+            Log.d(TAG, "Finished Updating connection indicators")
+
+            updateConnectionStatusUI(connectionStatusImage, connectionStatusText)
+        }
+
+        fun updateConnectedUI() {
+            while (!connectionStatus) {
+                updateConnectionStatus()
+            }
+            Log.d(TAG, "Connected. Updating connection indicators")
+            runOnUiThread {
+                connectionStatusImage.setImageResource(R.drawable.ic_connected)
+                connectionStatusText.setText(R.string.scan_dialog_connected)
+            }
+            Log.d(TAG, "Finished Updating connection indicators")
+            updateDisconnectedUI()
+        }
+
+        updateConnectedUI()
+    }
+
+    private fun updateConnectionStatus() {
+        fun isConnectionActive(socket: Socket): Boolean {
+            return try {
+                socket.getOutputStream().write(0)
+                true
+            } catch (e: Exception) {
+                return false
+            }
+        }
+        connectionStatus = (isConnectionActive(sendSocket) && isConnectionActive(recvSocket))
+    }
+
     override fun onStop() {
         super.onStop()
+        if (::validationThread.isInitialized)
+            if (validationThread.isAlive)
+                validationThread.interrupt()
         loadingGameProgressDialog?.dismiss()
     }
 

@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Typeface
 import android.os.Bundle
+import android.os.Parcelable
 import android.util.Log
 import android.view.Gravity
 import android.widget.Button
@@ -40,9 +41,6 @@ class GameMapActivity : AndroidApplication() {
 
     companion object {
         const val TAG = "GameMapActivity"
-
-        const val RPI_SEND_PORT = 50009
-        const val RPI_RECV_PORT = 50011
     }
 
     private val db = FirebaseFirestore.getInstance()
@@ -51,11 +49,14 @@ class GameMapActivity : AndroidApplication() {
     private var mapMatrix = MapMatrix()
 
     private var scanName: String? = null
-    private var mapScanMode: MapScanMode? = null
+    //private var mapScanMode: MapScanMode? = null
     private var scanRadius: Float? = null
     private var chosenFloorTile: String? = null
     private var chosenWallTile: String? = null
     private var chosenRobotTile: String? = null
+
+    private var sendSocket: Socket? = null
+    private var recvSocket: Socket? = null
 
     private lateinit var client: ClientThread
 
@@ -75,6 +76,7 @@ class GameMapActivity : AndroidApplication() {
             mapMatrix = createRandomDummyScan()
             game.setNewMap(mapMatrix)
         }
+
     }
 
     override fun onStop() {
@@ -102,10 +104,7 @@ class GameMapActivity : AndroidApplication() {
     }
 
     private fun setButtons() {
-        val ipAddress = getPreferences(Context.MODE_PRIVATE).getString(
-            getString(R.string.preference_ip_address_key), DEFAULT_IP_ADDRESS
-        )!!
-        thread { client = ClientThread(ipAddress, RPI_SEND_PORT, RPI_RECV_PORT) }
+        thread { client = ClientThread(sendSocket!!, recvSocket!!) }
     }
 
     private fun displayGameWindow() {
@@ -120,11 +119,14 @@ class GameMapActivity : AndroidApplication() {
 
     private fun fetchIntentData() {
         scanName = intent.getStringExtra(SCAN_NAME)
-        mapScanMode = intent.getSerializableExtra(MAP_SCAN_MODE) as MapScanMode
+        //mapScanMode = intent.getSerializableExtra(MAP_SCAN_MODE) as MapScanMode
         scanRadius = intent.getFloatExtra(SCAN_RADIUS, 1f)
         chosenFloorTile = intent.getStringExtra(CHOSEN_FLOOR_TILE)
         chosenWallTile = intent.getStringExtra(CHOSEN_WALL_TILE)
         chosenRobotTile = intent.getStringExtra(CHOSEN_ROBOT_TILE)
+
+        sendSocket = SocketsHolder.sendSocket
+        recvSocket = SocketsHolder.recvSocket
     }
 
     private fun displayFinishedScanDialog() {
@@ -224,31 +226,21 @@ class GameMapActivity : AndroidApplication() {
             }
     }
 
-    inner class ClientThread(
-        private val address: String, private val sendPort: Int,
-        private val recvPort: Int
-    ) {
-        private lateinit var sendSocket: Socket
-        private lateinit var recvSocket: Socket
+    inner class ClientThread(private val sendSocket: Socket, private var recvSocket: Socket) {
         private var scanIsOnline = false
         private var isConnectedToSocket = false
 
         init {
             setGameListeners()
-            connectToSocket(sendPort)
             configureButtons()
-            connectToSocket(recvPort)
             thread { listen() }
         }
 
-        private fun connectToSocket(port: Int) {
+        private fun connectToListenerSocket() {
             try {
-                val serverAddr = InetAddress.getByName(address)
-                when (port) {
-                    sendPort -> sendSocket = Socket(serverAddr, port)
-                    recvPort -> recvSocket = Socket(serverAddr, port)
-                }
-                Log.d(TAG, "Connected to port $port")
+                val serverAddr = recvSocket.inetAddress
+                recvSocket = Socket(serverAddr, RPI_RECV_PORT)
+                Log.d(TAG, "Connected to port $RPI_RECV_PORT")
                 isConnectedToSocket = true
             } catch (e: UnknownHostException) {
                 Log.d(TAG, "Caught UnknownHostException")
@@ -328,7 +320,7 @@ class GameMapActivity : AndroidApplication() {
             while (scanIsOnline) {
                 i++
                 if (!isConnectedToSocket)
-                    connectToSocket(recvPort)
+                    connectToListenerSocket()
                 try {
                     val scanner = Scanner(recvSocket.getInputStream())
                     val input = scanner.nextLine()

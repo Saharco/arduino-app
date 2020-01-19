@@ -7,6 +7,9 @@ const val CHOSEN_FLOOR_TILE = "chosen-floor-tile"
 const val CHOSEN_WALL_TILE = "chosen-wall-tile"
 const val CHOSEN_ROBOT_TILE = "chosen-robot-tile"
 
+const val RPI_SEND_PORT = 50009
+const val RPI_RECV_PORT = 50011
+
 const val SCAN = "scan"
 const val MAP_UPLOAD = "map-matrix"
 

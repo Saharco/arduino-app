@@ -79,18 +79,6 @@
         app:layout_constraintTop_toBottomOf="@id/controlModeTitle" />
 
 
-    <TextView
-        android:id="@+id/mapModeTitle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="24dp"
-        android:text="@string/map_mode_instruction"
-        android:textSize="16sp"
-        app:layout_constraintTop_toTopOf="@id/mapModeOptions"
-        app:layout_constraintBottom_toBottomOf="@id/mapModeOptions"
-        app:layout_constraintEnd_toStartOf="@id/mapModeOptions"
-        app:layout_constraintStart_toStartOf="parent" />
-
     <RadioGroup
         android:id="@+id/mapModeOptions"
         android:layout_width="0dp"
@@ -98,42 +86,9 @@
         android:layout_marginTop="16dp"
         android:gravity="center_horizontal"
         android:orientation="horizontal"
-        app:layout_constraintBottom_toTopOf="@+id/mapModeDivider"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@id/mapModeTitle"
-        app:layout_constraintTop_toTopOf="@id/controlModeDivider">
+        app:layout_constraintTop_toTopOf="@id/controlModeDivider" />
 
-        <RadioButton
-            android:id="@+id/mapModeGame"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:paddingStart="6dp"
-            android:paddingEnd="6dp"
-            android:textSize="13sp"
-            android:text="@string/pixel_map_option" />
-
-        <RadioButton
-            android:id="@+id/mapModeBlueprint"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:paddingStart="6dp"
-            android:paddingEnd="6dp"
-            android:textSize="13sp"
-            android:text="@string/blueprint_map_option" />
-
-    </RadioGroup>
-
-    <View
-        android:id="@+id/mapModeDivider"
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="6dp"
-        android:layout_marginEnd="16dp"
-        android:background="@color/contour"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/mapModeTitle" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/automaticModeOptions"
@@ -141,7 +96,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
         android:visibility="gone"
-        app:layout_constraintTop_toBottomOf="@+id/mapModeDivider">
+        app:layout_constraintTop_toBottomOf="@+id/controlModeDivider">
 
         <TextView
             android:id="@+id/scanRadiusTitle"
@@ -179,5 +134,24 @@
             app:layout_constraintTop_toBottomOf="@id/scanRadiusTitle"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <ImageView
+        android:id="@+id/connectionStatusImage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:scaleX="0.3"
+        android:scaleY="0.3"
+        app:layout_constraintTop_toBottomOf="@id/automaticModeOptions"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginStart="8dp" />
+
+    <TextView
+        android:id="@+id/connectionStatusText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="@id/connectionStatusImage"
+        app:layout_constraintBottom_toBottomOf="@id/connectionStatusImage"
+        app:layout_constraintStart_toEndOf="@id/connectionStatusImage"
+        android:text="" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
