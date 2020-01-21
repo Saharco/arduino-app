@@ -68,8 +68,8 @@ class ArduinoMap(
     }
 
     private fun clearMap() {
-        for (row in 0 until GameScreen.GAME_MAP_TILES_HEIGHT) {
-            for (col in 0 until GameScreen.GAME_MAP_TILES_WIDTH) {
+        for (row in 0 until height) {
+            for (col in 0 until width) {
                 floorTiles.setCell(row, col, null)
                 wallTiles.setCell(row, col, null)
             }
