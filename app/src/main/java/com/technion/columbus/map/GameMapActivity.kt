@@ -324,9 +324,9 @@ class GameMapActivity : AndroidApplication() {
                 try {
                     val scanner = Scanner(recvSocket.getInputStream())
                     val input = scanner.nextLine()
-                    val mapMatrix = parseInput(input.toByteArray())
+                    val newMapMatrix = parseInput(input.toByteArray())
 
-                    this@GameMapActivity.mapMatrix = mapMatrix
+                    mapMatrix = newMapMatrix
                     game.setNewMap(mapMatrix)
 
                     Log.d(TAG, "Map No. $i")

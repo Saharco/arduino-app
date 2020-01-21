@@ -30,6 +30,10 @@ data class MapMatrix(
         return com.technion.columbus.utility.serialize(this)
     }
 
+    fun mergeWith(otherMapMatrix: MapMatrix) {
+        TODO()
+    }
+
     override fun toString(): String {
         return "MapMatrix(rows=$rows, cols=$cols, robotX=$robotX, robotY=$robotY, " +
         "direction: $direction, map size: ${tiles.size}x${tiles[0].size})"

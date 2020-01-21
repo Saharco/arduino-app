@@ -55,12 +55,23 @@ class ArduinoMap(
     }
 
     fun setMapTiles(newTiles: Array<CharArray>, rowStart: Int = 0, colStart: Int = 0) {
+        clearMap()
+
         newTiles.forEachIndexed { row, charArray ->
             charArray.forEachIndexed { col, char ->
                 floorTiles.setCell(rowStart + row, colStart + col, floorTileCell)
 
                 if (char == '1')
                     wallTiles.setCell(rowStart + row, colStart + col, wallTileCell)
+            }
+        }
+    }
+
+    private fun clearMap() {
+        for (row in 0 until GameScreen.GAME_MAP_TILES_HEIGHT) {
+            for (col in 0 until GameScreen.GAME_MAP_TILES_WIDTH) {
+                floorTiles.setCell(row, col, null)
+                wallTiles.setCell(row, col, null)
             }
         }
     }
