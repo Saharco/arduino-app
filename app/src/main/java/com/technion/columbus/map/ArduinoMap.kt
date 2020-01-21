@@ -59,8 +59,8 @@ class ArduinoMap(
 
         newTiles.forEachIndexed { row, charArray ->
             charArray.forEachIndexed { col, char ->
-                floorTiles.setCell(rowStart + row, colStart + col, floorTileCell)
-
+                if (char != '?')
+                    floorTiles.setCell(rowStart + row, colStart + col, floorTileCell)
                 if (char == '1')
                     wallTiles.setCell(rowStart + row, colStart + col, wallTileCell)
             }
