@@ -4,6 +4,7 @@ import android.app.ProgressDialog
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.os.Handler
 import android.util.Log
 import android.view.View
 import android.widget.*
@@ -13,6 +14,7 @@ import androidx.core.content.ContextCompat
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.WhichButton
 import com.afollestad.materialdialogs.actions.setActionButtonEnabled
+import com.afollestad.materialdialogs.callbacks.onDismiss
 import com.afollestad.materialdialogs.customview.customView
 import com.afollestad.materialdialogs.customview.getCustomView
 import com.afollestad.materialdialogs.input.getInputField
@@ -27,6 +29,7 @@ import com.technion.columbus.map.SocketsHolder.Companion.sendSocket
 import com.technion.columbus.scans.ScanListActivity
 import com.technion.columbus.utility.*
 import kotlinx.android.synthetic.main.activity_main.*
+import java.io.IOException
 import java.net.Socket
 import kotlin.concurrent.thread
 
@@ -35,6 +38,7 @@ class MainActivity : AppCompatActivity() {
 
     companion object {
         const val TAG = "MainActivity"
+        const val CHECK_CONNECTION_INTERVAL = 2000L
     }
 
     private lateinit var floorSlotPicker: TileSlotPicker
@@ -44,7 +48,8 @@ class MainActivity : AppCompatActivity() {
     private var loadingGameProgressDialog: ProgressDialog? = null
 
     private var connectionStatus = false
-    private lateinit var validationThread: Thread
+    private var validationHandler = Handler()
+    private var configurationDialog: MaterialDialog? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -64,6 +69,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onStart() {
         super.onStart()
+        connectionStatus = false
         val ipAddress = getPreferences(Context.MODE_PRIVATE).getString(
             getString(R.string.preference_ip_address_key), DEFAULT_IP_ADDRESS
         )!!
@@ -195,13 +201,13 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun displayConfigurationDialog() {
-        val dialog = MaterialDialog(this@MainActivity)
-        dialog.cornerRadius(20f)
+        configurationDialog = MaterialDialog(this@MainActivity)
+        configurationDialog!!.cornerRadius(20f)
             .title(R.string.scan_configuration_title)
             .noAutoDismiss()
             .customView(R.layout.fragment_scan_configuration, scrollable = true)
 
-        val dialogView = dialog.getCustomView()
+        val dialogView = configurationDialog!!.getCustomView()
 
         val connectionStatusImage = dialogView.findViewById<ImageView>(R.id.connectionStatusImage)
         val connectionStatusText = dialogView.findViewById<TextView>(R.id.connectionStatusText)
@@ -222,9 +228,7 @@ class MainActivity : AppCompatActivity() {
         val scanRadiusPicker = dialogView.findViewById<TickerView>(R.id.scanRadiusPicker)
         val scanRadiusSeekBar = dialogView.findViewById<SeekBar>(R.id.scanRadiusSeekBar)
 
-        validationThread = thread { updateConnectionStatusUI(connectionStatusImage, connectionStatusText) }
-
-        dialog.positiveButton {
+        configurationDialog?.positiveButton {
             val name = scanName.text.trim()
             if (name.isEmpty()) {
                 Toast.makeText(
@@ -256,8 +260,10 @@ class MainActivity : AppCompatActivity() {
 //            }
 
             if (!connectionStatus) {
-                Toast.makeText(this@MainActivity.applicationContext, "No connection with Columbus",
-                    Toast.LENGTH_LONG).show()
+                Toast.makeText(
+                    this@MainActivity.applicationContext, "No connection with Columbus",
+                    Toast.LENGTH_LONG
+                ).show()
                 return@positiveButton
             }
 
@@ -276,7 +282,7 @@ class MainActivity : AppCompatActivity() {
                 CHOSEN_ROBOT_TILE,
                 tileResourceToString(robotSlotPicker.tileId)
             )
-            dialog.dismiss()
+            configurationDialog?.dismiss()
 
             loadingGameProgressDialog = ProgressDialog.show(
                 this@MainActivity,
@@ -289,11 +295,25 @@ class MainActivity : AppCompatActivity() {
             startActivity(startGameIntent)
         }
 
-        dialog.negativeButton {
-            dialog.dismiss()
+        configurationDialog?.negativeButton {
+            configurationDialog?.dismiss()
         }
 
-        dialog.show {
+
+        val handlerRunnable = object: Runnable {
+            override fun run() {
+                updateConnectionStatusUI(connectionStatusImage, connectionStatusText)
+                validationHandler.postDelayed(this, CHECK_CONNECTION_INTERVAL)
+            }
+        }
+
+        validationHandler.post(handlerRunnable)
+
+        configurationDialog?.onDismiss {
+            validationHandler.removeCallbacksAndMessages(null)
+        }
+
+        configurationDialog?.show {
 
             scanRadiusPicker.setCharacterLists(TickerUtils.provideNumberList())
             scanRadiusSeekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
@@ -333,65 +353,84 @@ class MainActivity : AppCompatActivity() {
                 SocketsHandler(ipAddress, RPI_SEND_PORT, RPI_RECV_PORT)
             thread {
                 while (!sendSocket.isConnected) {
+                    Thread.sleep(CHECK_CONNECTION_INTERVAL)
                     sendSocket = initSockets.getSendSocket()
                 }
             }
             thread {
                 while (!recvSocket.isConnected) {
+                    Thread.sleep(CHECK_CONNECTION_INTERVAL)
                     recvSocket = initSockets.getRecvSocket()
                 }
             }
         }
     }
 
-    private fun updateConnectionStatusUI(connectionStatusImage: ImageView, connectionStatusText: TextView) {
+    private fun updateConnectionStatusUI(
+        connectionStatusImage: ImageView,
+        connectionStatusText: TextView
+    ) {
         fun updateDisconnectedUI() {
-            while (connectionStatus) {
-                updateConnectionStatus()
-            }
+            if (!isConnectionStatusChanged())
+                return
             Log.d(TAG, "Disconnected. Updating connection indicators")
             runOnUiThread {
                 connectionStatusImage.setImageResource(R.drawable.ic_disconnected)
                 connectionStatusText.setText(R.string.scan_dialog_disconnected)
             }
             Log.d(TAG, "Finished Updating connection indicators")
-
-            updateConnectionStatusUI(connectionStatusImage, connectionStatusText)
         }
 
         fun updateConnectedUI() {
-            while (!connectionStatus) {
-                updateConnectionStatus()
-            }
+            if (!isConnectionStatusChanged())
+                return
             Log.d(TAG, "Connected. Updating connection indicators")
             runOnUiThread {
                 connectionStatusImage.setImageResource(R.drawable.ic_connected)
                 connectionStatusText.setText(R.string.scan_dialog_connected)
             }
             Log.d(TAG, "Finished Updating connection indicators")
-            updateDisconnectedUI()
         }
 
-        updateConnectedUI()
+        if (connectionStatus) {
+            updateDisconnectedUI()
+        } else {
+            updateConnectedUI()
+        }
+    }
+
+    private fun isConnectionStatusChanged(): Boolean {
+        val prevConnectionStatus = connectionStatus
+        updateConnectionStatus()
+        if (connectionStatus != prevConnectionStatus)
+            return true
+        return false
     }
 
     private fun updateConnectionStatus() {
         fun isConnectionActive(socket: Socket): Boolean {
             return try {
-                socket.getOutputStream().write(0)
-                true
+                socket.inetAddress.isReachable(5000)
             } catch (e: Exception) {
+                Log.d(TAG, "Got exception when checking connection with port ${socket.port}")
                 return false
             }
         }
-        connectionStatus = (isConnectionActive(sendSocket) && isConnectionActive(recvSocket))
+
+        fun checkConnectivity(): Boolean {
+            var status = false
+            thread { status = isConnectionActive(sendSocket) && isConnectionActive(recvSocket)}.join()
+            return status
+        }
+
+        connectionStatus = checkConnectivity()
+        Log.d(TAG, "connectionStatus is $connectionStatus")
     }
 
     override fun onStop() {
         super.onStop()
-        if (::validationThread.isInitialized)
-            if (validationThread.isAlive)
-                validationThread.interrupt()
+        configurationDialog?.dismiss()
+        validationHandler.removeCallbacksAndMessages(null)
         loadingGameProgressDialog?.dismiss()
     }
 

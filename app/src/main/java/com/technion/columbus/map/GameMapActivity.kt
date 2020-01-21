@@ -5,7 +5,6 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Typeface
 import android.os.Bundle
-import android.os.Parcelable
 import android.util.Log
 import android.view.Gravity
 import android.widget.Button
@@ -24,13 +23,11 @@ import com.google.firebase.storage.FirebaseStorage
 import com.technion.columbus.R
 import com.technion.columbus.main.MainActivity
 import com.technion.columbus.pojos.MapMatrix
-import com.technion.columbus.pojos.MapScanMode
 import com.technion.columbus.pojos.Scan
 import com.technion.columbus.utility.*
 import it.emperor.animatedcheckbox.AnimatedCheckBox
 import kotlinx.android.synthetic.main.activity_game_map.*
 import java.io.IOException
-import java.net.InetAddress
 import java.net.Socket
 import java.net.UnknownHostException
 import java.util.*
@@ -356,18 +353,14 @@ class GameMapActivity : AndroidApplication() {
     private fun parseInput(input: ByteArray): MapMatrix {
         val width = (input.copyOfRange(0, 10)).toString(Charsets.UTF_8).toInt()
         val height = (input.copyOfRange(10, 20)).toString(Charsets.UTF_8).toInt()
-        val robotX = (input.copyOfRange(
-            20,
-            40
-        )).toString(Charsets.UTF_8).toDouble() + GameScreen.GAME_MAP_TILES_WIDTH / 2
-        val robotY = (input.copyOfRange(
-            40,
-            60
-        )).toString(Charsets.UTF_8).toDouble() + GameScreen.GAME_MAP_TILES_HEIGHT / 2
-//        val direction = (input.copyOfRange(60, 80)).toString(Charsets.UTF_8).toDouble()
-//        Log.d(TAG, "direction: $direction")
+        val robotX = (input.copyOfRange(20, 40)).toString(Charsets.UTF_8).toDouble() +
+                GameScreen.GAME_MAP_TILES_WIDTH / 2
+        val robotY = (input.copyOfRange(40, 60)).toString(Charsets.UTF_8).toDouble() +
+                GameScreen.GAME_MAP_TILES_HEIGHT / 2
+        val direction = (input.copyOfRange(60, 80)).toString(Charsets.UTF_8).toDouble()
+        Log.d(TAG, "direction: $direction")
 
-        val mapByteArray = input.copyOfRange(60, 60 + (width * height))
+        val mapByteArray = input.copyOfRange(80, 80 + (width * height))
         val mapArray = CharArray(mapByteArray.size)
         for (i in mapArray.indices)
             mapArray[i] = mapByteArray[i].toChar()
@@ -375,15 +368,15 @@ class GameMapActivity : AndroidApplication() {
         val detMapArray = convertToDeterministicArray(mapArray)
         val matrix = convertToMatrix(detMapArray, width, height)
 
-//        val dirCode = getDirectionCode(direction)
+        val dirCode = getDirectionCode(direction)
         return MapMatrix(
             height,
             width,
             robotX,
             robotY,
-            'd',
+            dirCode,
             matrix
-        )  // TODO: Change direction to received one
+        )
     }
 
     private fun getDirectionCode(direction: Double): Char {
@@ -429,7 +422,7 @@ class GameMapActivity : AndroidApplication() {
     private fun convertToMatrix(array: CharArray, width: Int, height: Int): Array<CharArray> {
         val matrix: ArrayList<CharArray> = arrayListOf()
         for (i in 0 until height) {
-            matrix.add(array.copyOfRange((height - i - 1) * width, ((height - i) * width)))
+            matrix.add(array.copyOfRange((height - i - 1) * width, ((height - i) * width)).reversedArray())
         }
 
 
